@@ -1,0 +1,733 @@
+Terminais sem uso na gramática
+
+   ATRIBUICAO
+   DO
+   WHILE
+
+
+Gramática
+
+    0 $accept: programa $end
+
+    1 $@1: %empty
+
+    2 programa: $@1 PROGRAM IDENT ABRE_PARENTESES lista_de_identificadores FECHA_PARENTESES PONTO_E_VIRGULA bloco PONTO
+
+    3 bloco: parte_de_declaracao_de_variaveis comando_composto
+
+    4 parte_de_declaracao_de_variaveis: parte_de_declaracao_de_variaveis declaracao_de_variaveis
+
+    5 $@2: %empty
+
+    6 parte_de_declaracao_de_variaveis: VAR $@2 declaracao_de_variaveis
+
+    7 $@3: %empty
+
+    8 $@4: %empty
+
+    9 declaracao_de_variaveis: $@3 lista_de_identificadores DOIS_PONTOS TIPO $@4 PONTO_E_VIRGULA
+
+   10 lista_de_identificadores: lista_de_identificadores VIRGULA IDENT
+   11                         | IDENT
+
+   12 comando_composto: T_BEGIN comandos T_END
+
+   13 comandos: comandos PONTO_E_VIRGULA comando
+   14         | comando
+
+   15 $@5: %empty
+
+   16 comando: NUMERO $@5 DOIS_PONTOS comando_sem_rotulo
+   17        | comando_sem_rotulo
+
+   18 comando_sem_rotulo: atribuicao
+   19                   | comando_composto
+   20                   | %empty
+
+   21 atribuicao: variavel DOIS_PONTOS IGUAL expressao
+
+   22 expressao: expressao MAIS T
+   23          | expressao MENOS T
+   24          | expressao OR T
+   25          | T
+
+   26 T: T ASTERISTICO F
+   27  | T DIV F
+   28  | T AND F
+   29  | F
+
+   30 F: variavel
+   31  | ABRE_PARENTESES expressao FECHA_PARENTESES
+   32  | NUMERO
+
+   33 variavel: IDENT
+
+
+Terminais, com as regras onde eles aparecem
+
+$end (0) 0
+error (256)
+PROGRAM (258) 2
+ABRE_PARENTESES (259) 2 31
+FECHA_PARENTESES (260) 2 31
+VIRGULA (261) 10
+PONTO_E_VIRGULA (262) 2 9 13
+DOIS_PONTOS (263) 9 16 21
+PONTO (264) 2
+T_BEGIN (265) 12
+T_END (266) 12
+VAR (267) 6
+IDENT (268) 2 10 11 33
+TIPO (269) 9
+ATRIBUICAO (270)
+AND (271) 28
+DIV (272) 27
+IGUAL (273) 21
+MAIS (274) 22
+MENOS (275) 23
+OR (276) 24
+DO (277)
+WHILE (278)
+ASTERISTICO (279) 26
+NUMERO (280) 16 32
+
+
+Não terminais com as regras onde eles aparecem
+
+$accept (26)
+    à esquerda: 0
+programa (27)
+    à esquerda: 2, à direita: 0
+$@1 (28)
+    à esquerda: 1, à direita: 2
+bloco (29)
+    à esquerda: 3, à direita: 2
+parte_de_declaracao_de_variaveis (30)
+    à esquerda: 4 6, à direita: 3 4
+$@2 (31)
+    à esquerda: 5, à direita: 6
+declaracao_de_variaveis (32)
+    à esquerda: 9, à direita: 4 6
+$@3 (33)
+    à esquerda: 7, à direita: 9
+$@4 (34)
+    à esquerda: 8, à direita: 9
+lista_de_identificadores (35)
+    à esquerda: 10 11, à direita: 2 9 10
+comando_composto (36)
+    à esquerda: 12, à direita: 3 19
+comandos (37)
+    à esquerda: 13 14, à direita: 12 13
+comando (38)
+    à esquerda: 16 17, à direita: 13 14
+$@5 (39)
+    à esquerda: 15, à direita: 16
+comando_sem_rotulo (40)
+    à esquerda: 18 19 20, à direita: 16 17
+atribuicao (41)
+    à esquerda: 21, à direita: 18
+expressao (42)
+    à esquerda: 22 23 24 25, à direita: 21 22 23 24 31
+T (43)
+    à esquerda: 26 27 28 29, à direita: 22 23 24 25 26 27 28
+F (44)
+    à esquerda: 30 31 32, à direita: 26 27 28 29
+variavel (45)
+    à esquerda: 33, à direita: 21 30
+
+
+Estado 0
+
+    0 $accept: . programa $end
+
+    $padrão  reduzir usando a regra 1 ($@1)
+
+    programa  ir ao estado 1
+    $@1       ir ao estado 2
+
+
+Estado 1
+
+    0 $accept: programa . $end
+
+    $end  deslocar, e ir ao estado 3
+
+
+Estado 2
+
+    2 programa: $@1 . PROGRAM IDENT ABRE_PARENTESES lista_de_identificadores FECHA_PARENTESES PONTO_E_VIRGULA bloco PONTO
+
+    PROGRAM  deslocar, e ir ao estado 4
+
+
+Estado 3
+
+    0 $accept: programa $end .
+
+    $padrão  aceitar
+
+
+Estado 4
+
+    2 programa: $@1 PROGRAM . IDENT ABRE_PARENTESES lista_de_identificadores FECHA_PARENTESES PONTO_E_VIRGULA bloco PONTO
+
+    IDENT  deslocar, e ir ao estado 5
+
+
+Estado 5
+
+    2 programa: $@1 PROGRAM IDENT . ABRE_PARENTESES lista_de_identificadores FECHA_PARENTESES PONTO_E_VIRGULA bloco PONTO
+
+    ABRE_PARENTESES  deslocar, e ir ao estado 6
+
+
+Estado 6
+
+    2 programa: $@1 PROGRAM IDENT ABRE_PARENTESES . lista_de_identificadores FECHA_PARENTESES PONTO_E_VIRGULA bloco PONTO
+
+    IDENT  deslocar, e ir ao estado 7
+
+    lista_de_identificadores  ir ao estado 8
+
+
+Estado 7
+
+   11 lista_de_identificadores: IDENT .
+
+    $padrão  reduzir usando a regra 11 (lista_de_identificadores)
+
+
+Estado 8
+
+    2 programa: $@1 PROGRAM IDENT ABRE_PARENTESES lista_de_identificadores . FECHA_PARENTESES PONTO_E_VIRGULA bloco PONTO
+   10 lista_de_identificadores: lista_de_identificadores . VIRGULA IDENT
+
+    FECHA_PARENTESES  deslocar, e ir ao estado 9
+    VIRGULA           deslocar, e ir ao estado 10
+
+
+Estado 9
+
+    2 programa: $@1 PROGRAM IDENT ABRE_PARENTESES lista_de_identificadores FECHA_PARENTESES . PONTO_E_VIRGULA bloco PONTO
+
+    PONTO_E_VIRGULA  deslocar, e ir ao estado 11
+
+
+Estado 10
+
+   10 lista_de_identificadores: lista_de_identificadores VIRGULA . IDENT
+
+    IDENT  deslocar, e ir ao estado 12
+
+
+Estado 11
+
+    2 programa: $@1 PROGRAM IDENT ABRE_PARENTESES lista_de_identificadores FECHA_PARENTESES PONTO_E_VIRGULA . bloco PONTO
+
+    VAR  deslocar, e ir ao estado 13
+
+    bloco                             ir ao estado 14
+    parte_de_declaracao_de_variaveis  ir ao estado 15
+
+
+Estado 12
+
+   10 lista_de_identificadores: lista_de_identificadores VIRGULA IDENT .
+
+    $padrão  reduzir usando a regra 10 (lista_de_identificadores)
+
+
+Estado 13
+
+    6 parte_de_declaracao_de_variaveis: VAR . $@2 declaracao_de_variaveis
+
+    $padrão  reduzir usando a regra 5 ($@2)
+
+    $@2  ir ao estado 16
+
+
+Estado 14
+
+    2 programa: $@1 PROGRAM IDENT ABRE_PARENTESES lista_de_identificadores FECHA_PARENTESES PONTO_E_VIRGULA bloco . PONTO
+
+    PONTO  deslocar, e ir ao estado 17
+
+
+Estado 15
+
+    3 bloco: parte_de_declaracao_de_variaveis . comando_composto
+    4 parte_de_declaracao_de_variaveis: parte_de_declaracao_de_variaveis . declaracao_de_variaveis
+
+    T_BEGIN  deslocar, e ir ao estado 18
+
+    $padrão  reduzir usando a regra 7 ($@3)
+
+    declaracao_de_variaveis  ir ao estado 19
+    $@3                      ir ao estado 20
+    comando_composto         ir ao estado 21
+
+
+Estado 16
+
+    6 parte_de_declaracao_de_variaveis: VAR $@2 . declaracao_de_variaveis
+
+    $padrão  reduzir usando a regra 7 ($@3)
+
+    declaracao_de_variaveis  ir ao estado 22
+    $@3                      ir ao estado 20
+
+
+Estado 17
+
+    2 programa: $@1 PROGRAM IDENT ABRE_PARENTESES lista_de_identificadores FECHA_PARENTESES PONTO_E_VIRGULA bloco PONTO .
+
+    $padrão  reduzir usando a regra 2 (programa)
+
+
+Estado 18
+
+   12 comando_composto: T_BEGIN . comandos T_END
+
+    T_BEGIN  deslocar, e ir ao estado 18
+    IDENT    deslocar, e ir ao estado 23
+    NUMERO   deslocar, e ir ao estado 24
+
+    $padrão  reduzir usando a regra 20 (comando_sem_rotulo)
+
+    comando_composto    ir ao estado 25
+    comandos            ir ao estado 26
+    comando             ir ao estado 27
+    comando_sem_rotulo  ir ao estado 28
+    atribuicao          ir ao estado 29
+    variavel            ir ao estado 30
+
+
+Estado 19
+
+    4 parte_de_declaracao_de_variaveis: parte_de_declaracao_de_variaveis declaracao_de_variaveis .
+
+    $padrão  reduzir usando a regra 4 (parte_de_declaracao_de_variaveis)
+
+
+Estado 20
+
+    9 declaracao_de_variaveis: $@3 . lista_de_identificadores DOIS_PONTOS TIPO $@4 PONTO_E_VIRGULA
+
+    IDENT  deslocar, e ir ao estado 7
+
+    lista_de_identificadores  ir ao estado 31
+
+
+Estado 21
+
+    3 bloco: parte_de_declaracao_de_variaveis comando_composto .
+
+    $padrão  reduzir usando a regra 3 (bloco)
+
+
+Estado 22
+
+    6 parte_de_declaracao_de_variaveis: VAR $@2 declaracao_de_variaveis .
+
+    $padrão  reduzir usando a regra 6 (parte_de_declaracao_de_variaveis)
+
+
+Estado 23
+
+   33 variavel: IDENT .
+
+    $padrão  reduzir usando a regra 33 (variavel)
+
+
+Estado 24
+
+   16 comando: NUMERO . $@5 DOIS_PONTOS comando_sem_rotulo
+
+    $padrão  reduzir usando a regra 15 ($@5)
+
+    $@5  ir ao estado 32
+
+
+Estado 25
+
+   19 comando_sem_rotulo: comando_composto .
+
+    $padrão  reduzir usando a regra 19 (comando_sem_rotulo)
+
+
+Estado 26
+
+   12 comando_composto: T_BEGIN comandos . T_END
+   13 comandos: comandos . PONTO_E_VIRGULA comando
+
+    PONTO_E_VIRGULA  deslocar, e ir ao estado 33
+    T_END            deslocar, e ir ao estado 34
+
+
+Estado 27
+
+   14 comandos: comando .
+
+    $padrão  reduzir usando a regra 14 (comandos)
+
+
+Estado 28
+
+   17 comando: comando_sem_rotulo .
+
+    $padrão  reduzir usando a regra 17 (comando)
+
+
+Estado 29
+
+   18 comando_sem_rotulo: atribuicao .
+
+    $padrão  reduzir usando a regra 18 (comando_sem_rotulo)
+
+
+Estado 30
+
+   21 atribuicao: variavel . DOIS_PONTOS IGUAL expressao
+
+    DOIS_PONTOS  deslocar, e ir ao estado 35
+
+
+Estado 31
+
+    9 declaracao_de_variaveis: $@3 lista_de_identificadores . DOIS_PONTOS TIPO $@4 PONTO_E_VIRGULA
+   10 lista_de_identificadores: lista_de_identificadores . VIRGULA IDENT
+
+    VIRGULA      deslocar, e ir ao estado 10
+    DOIS_PONTOS  deslocar, e ir ao estado 36
+
+
+Estado 32
+
+   16 comando: NUMERO $@5 . DOIS_PONTOS comando_sem_rotulo
+
+    DOIS_PONTOS  deslocar, e ir ao estado 37
+
+
+Estado 33
+
+   13 comandos: comandos PONTO_E_VIRGULA . comando
+
+    T_BEGIN  deslocar, e ir ao estado 18
+    IDENT    deslocar, e ir ao estado 23
+    NUMERO   deslocar, e ir ao estado 24
+
+    $padrão  reduzir usando a regra 20 (comando_sem_rotulo)
+
+    comando_composto    ir ao estado 25
+    comando             ir ao estado 38
+    comando_sem_rotulo  ir ao estado 28
+    atribuicao          ir ao estado 29
+    variavel            ir ao estado 30
+
+
+Estado 34
+
+   12 comando_composto: T_BEGIN comandos T_END .
+
+    $padrão  reduzir usando a regra 12 (comando_composto)
+
+
+Estado 35
+
+   21 atribuicao: variavel DOIS_PONTOS . IGUAL expressao
+
+    IGUAL  deslocar, e ir ao estado 39
+
+
+Estado 36
+
+    9 declaracao_de_variaveis: $@3 lista_de_identificadores DOIS_PONTOS . TIPO $@4 PONTO_E_VIRGULA
+
+    TIPO  deslocar, e ir ao estado 40
+
+
+Estado 37
+
+   16 comando: NUMERO $@5 DOIS_PONTOS . comando_sem_rotulo
+
+    T_BEGIN  deslocar, e ir ao estado 18
+    IDENT    deslocar, e ir ao estado 23
+
+    $padrão  reduzir usando a regra 20 (comando_sem_rotulo)
+
+    comando_composto    ir ao estado 25
+    comando_sem_rotulo  ir ao estado 41
+    atribuicao          ir ao estado 29
+    variavel            ir ao estado 30
+
+
+Estado 38
+
+   13 comandos: comandos PONTO_E_VIRGULA comando .
+
+    $padrão  reduzir usando a regra 13 (comandos)
+
+
+Estado 39
+
+   21 atribuicao: variavel DOIS_PONTOS IGUAL . expressao
+
+    ABRE_PARENTESES  deslocar, e ir ao estado 42
+    IDENT            deslocar, e ir ao estado 23
+    NUMERO           deslocar, e ir ao estado 43
+
+    expressao  ir ao estado 44
+    T          ir ao estado 45
+    F          ir ao estado 46
+    variavel   ir ao estado 47
+
+
+Estado 40
+
+    9 declaracao_de_variaveis: $@3 lista_de_identificadores DOIS_PONTOS TIPO . $@4 PONTO_E_VIRGULA
+
+    $padrão  reduzir usando a regra 8 ($@4)
+
+    $@4  ir ao estado 48
+
+
+Estado 41
+
+   16 comando: NUMERO $@5 DOIS_PONTOS comando_sem_rotulo .
+
+    $padrão  reduzir usando a regra 16 (comando)
+
+
+Estado 42
+
+   31 F: ABRE_PARENTESES . expressao FECHA_PARENTESES
+
+    ABRE_PARENTESES  deslocar, e ir ao estado 42
+    IDENT            deslocar, e ir ao estado 23
+    NUMERO           deslocar, e ir ao estado 43
+
+    expressao  ir ao estado 49
+    T          ir ao estado 45
+    F          ir ao estado 46
+    variavel   ir ao estado 47
+
+
+Estado 43
+
+   32 F: NUMERO .
+
+    $padrão  reduzir usando a regra 32 (F)
+
+
+Estado 44
+
+   21 atribuicao: variavel DOIS_PONTOS IGUAL expressao .
+   22 expressao: expressao . MAIS T
+   23          | expressao . MENOS T
+   24          | expressao . OR T
+
+    MAIS   deslocar, e ir ao estado 50
+    MENOS  deslocar, e ir ao estado 51
+    OR     deslocar, e ir ao estado 52
+
+    $padrão  reduzir usando a regra 21 (atribuicao)
+
+
+Estado 45
+
+   25 expressao: T .
+   26 T: T . ASTERISTICO F
+   27  | T . DIV F
+   28  | T . AND F
+
+    AND          deslocar, e ir ao estado 53
+    DIV          deslocar, e ir ao estado 54
+    ASTERISTICO  deslocar, e ir ao estado 55
+
+    $padrão  reduzir usando a regra 25 (expressao)
+
+
+Estado 46
+
+   29 T: F .
+
+    $padrão  reduzir usando a regra 29 (T)
+
+
+Estado 47
+
+   30 F: variavel .
+
+    $padrão  reduzir usando a regra 30 (F)
+
+
+Estado 48
+
+    9 declaracao_de_variaveis: $@3 lista_de_identificadores DOIS_PONTOS TIPO $@4 . PONTO_E_VIRGULA
+
+    PONTO_E_VIRGULA  deslocar, e ir ao estado 56
+
+
+Estado 49
+
+   22 expressao: expressao . MAIS T
+   23          | expressao . MENOS T
+   24          | expressao . OR T
+   31 F: ABRE_PARENTESES expressao . FECHA_PARENTESES
+
+    FECHA_PARENTESES  deslocar, e ir ao estado 57
+    MAIS              deslocar, e ir ao estado 50
+    MENOS             deslocar, e ir ao estado 51
+    OR                deslocar, e ir ao estado 52
+
+
+Estado 50
+
+   22 expressao: expressao MAIS . T
+
+    ABRE_PARENTESES  deslocar, e ir ao estado 42
+    IDENT            deslocar, e ir ao estado 23
+    NUMERO           deslocar, e ir ao estado 43
+
+    T         ir ao estado 58
+    F         ir ao estado 46
+    variavel  ir ao estado 47
+
+
+Estado 51
+
+   23 expressao: expressao MENOS . T
+
+    ABRE_PARENTESES  deslocar, e ir ao estado 42
+    IDENT            deslocar, e ir ao estado 23
+    NUMERO           deslocar, e ir ao estado 43
+
+    T         ir ao estado 59
+    F         ir ao estado 46
+    variavel  ir ao estado 47
+
+
+Estado 52
+
+   24 expressao: expressao OR . T
+
+    ABRE_PARENTESES  deslocar, e ir ao estado 42
+    IDENT            deslocar, e ir ao estado 23
+    NUMERO           deslocar, e ir ao estado 43
+
+    T         ir ao estado 60
+    F         ir ao estado 46
+    variavel  ir ao estado 47
+
+
+Estado 53
+
+   28 T: T AND . F
+
+    ABRE_PARENTESES  deslocar, e ir ao estado 42
+    IDENT            deslocar, e ir ao estado 23
+    NUMERO           deslocar, e ir ao estado 43
+
+    F         ir ao estado 61
+    variavel  ir ao estado 47
+
+
+Estado 54
+
+   27 T: T DIV . F
+
+    ABRE_PARENTESES  deslocar, e ir ao estado 42
+    IDENT            deslocar, e ir ao estado 23
+    NUMERO           deslocar, e ir ao estado 43
+
+    F         ir ao estado 62
+    variavel  ir ao estado 47
+
+
+Estado 55
+
+   26 T: T ASTERISTICO . F
+
+    ABRE_PARENTESES  deslocar, e ir ao estado 42
+    IDENT            deslocar, e ir ao estado 23
+    NUMERO           deslocar, e ir ao estado 43
+
+    F         ir ao estado 63
+    variavel  ir ao estado 47
+
+
+Estado 56
+
+    9 declaracao_de_variaveis: $@3 lista_de_identificadores DOIS_PONTOS TIPO $@4 PONTO_E_VIRGULA .
+
+    $padrão  reduzir usando a regra 9 (declaracao_de_variaveis)
+
+
+Estado 57
+
+   31 F: ABRE_PARENTESES expressao FECHA_PARENTESES .
+
+    $padrão  reduzir usando a regra 31 (F)
+
+
+Estado 58
+
+   22 expressao: expressao MAIS T .
+   26 T: T . ASTERISTICO F
+   27  | T . DIV F
+   28  | T . AND F
+
+    AND          deslocar, e ir ao estado 53
+    DIV          deslocar, e ir ao estado 54
+    ASTERISTICO  deslocar, e ir ao estado 55
+
+    $padrão  reduzir usando a regra 22 (expressao)
+
+
+Estado 59
+
+   23 expressao: expressao MENOS T .
+   26 T: T . ASTERISTICO F
+   27  | T . DIV F
+   28  | T . AND F
+
+    AND          deslocar, e ir ao estado 53
+    DIV          deslocar, e ir ao estado 54
+    ASTERISTICO  deslocar, e ir ao estado 55
+
+    $padrão  reduzir usando a regra 23 (expressao)
+
+
+Estado 60
+
+   24 expressao: expressao OR T .
+   26 T: T . ASTERISTICO F
+   27  | T . DIV F
+   28  | T . AND F
+
+    AND          deslocar, e ir ao estado 53
+    DIV          deslocar, e ir ao estado 54
+    ASTERISTICO  deslocar, e ir ao estado 55
+
+    $padrão  reduzir usando a regra 24 (expressao)
+
+
+Estado 61
+
+   28 T: T AND F .
+
+    $padrão  reduzir usando a regra 28 (T)
+
+
+Estado 62
+
+   27 T: T DIV F .
+
+    $padrão  reduzir usando a regra 27 (T)
+
+
+Estado 63
+
+   26 T: T ASTERISTICO F .
+
+    $padrão  reduzir usando a regra 26 (T)
