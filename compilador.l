@@ -57,11 +57,17 @@ end { simbolo = simb_end;
           return T_END;
  }
 
-:= { simbolo = simb_atribuicao;  
+= { simbolo = simb_igual;  
           strncpy (token, yytext, TAM_TOKEN);
-          IMPRIME("atribuicao       ");
-          return ATRIBUICAO;  
+          IMPRIME("igual            ");
+          return IGUAL;  
  }
+
+- { simbolo = simb_menos;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("menos            ");
+          return MENOS;
+  }
 
 \; { simbolo = simb_ponto_e_virgula;  
           strncpy (token, yytext, TAM_TOKEN);
@@ -110,6 +116,12 @@ integer {
           IMPRIME("ident            ");
           return IDENT;
         }
+
+{numero} { simbolo = simb_numero;
+           strncpy (token, yytext, TAM_TOKEN);
+           IMPRIME("numero           ");
+           return NUMERO;
+         }
 
 
 %%

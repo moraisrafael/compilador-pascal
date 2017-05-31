@@ -1,6 +1,5 @@
 Terminais sem uso na gramática
 
-   ATRIBUICAO
    DO
    WHILE
 
@@ -44,23 +43,23 @@ Gramática
    19                   | comando_composto
    20                   | %empty
 
-   21 atribuicao: variavel DOIS_PONTOS IGUAL expressao
+   21 $@6: %empty
 
-   22 expressao: expressao MAIS T
-   23          | expressao MENOS T
-   24          | expressao OR T
-   25          | T
+   22 atribuicao: IDENT $@6 DOIS_PONTOS IGUAL expressao
 
-   26 T: T ASTERISTICO F
-   27  | T DIV F
-   28  | T AND F
-   29  | F
+   23 expressao: expressao MAIS T
+   24          | expressao MENOS T
+   25          | expressao OR T
+   26          | T
 
-   30 F: variavel
-   31  | ABRE_PARENTESES expressao FECHA_PARENTESES
-   32  | NUMERO
+   27 T: T ASTERISTICO F
+   28  | T DIV F
+   29  | T AND F
+   30  | F
 
-   33 variavel: IDENT
+   31 F: IDENT
+   32  | ABRE_PARENTESES expressao FECHA_PARENTESES
+   33  | NUMERO
 
 
 Terminais, com as regras onde eles aparecem
@@ -68,72 +67,71 @@ Terminais, com as regras onde eles aparecem
 $end (0) 0
 error (256)
 PROGRAM (258) 2
-ABRE_PARENTESES (259) 2 31
-FECHA_PARENTESES (260) 2 31
+ABRE_PARENTESES (259) 2 32
+FECHA_PARENTESES (260) 2 32
 VIRGULA (261) 10
 PONTO_E_VIRGULA (262) 2 9 13
-DOIS_PONTOS (263) 9 16 21
+DOIS_PONTOS (263) 9 16 22
 PONTO (264) 2
 T_BEGIN (265) 12
 T_END (266) 12
 VAR (267) 6
-IDENT (268) 2 10 11 33
+IDENT (268) 2 10 11 22 31
 TIPO (269) 9
-ATRIBUICAO (270)
-AND (271) 28
-DIV (272) 27
-IGUAL (273) 21
-MAIS (274) 22
-MENOS (275) 23
-OR (276) 24
-DO (277)
-WHILE (278)
-ASTERISTICO (279) 26
-NUMERO (280) 16 32
+AND (270) 29
+DIV (271) 28
+IGUAL (272) 22
+MAIS (273) 23
+MENOS (274) 24
+OR (275) 25
+DO (276)
+WHILE (277)
+ASTERISTICO (278) 27
+NUMERO (279) 16 33
 
 
 Não terminais com as regras onde eles aparecem
 
-$accept (26)
+$accept (25)
     à esquerda: 0
-programa (27)
+programa (26)
     à esquerda: 2, à direita: 0
-$@1 (28)
+$@1 (27)
     à esquerda: 1, à direita: 2
-bloco (29)
+bloco (28)
     à esquerda: 3, à direita: 2
-parte_de_declaracao_de_variaveis (30)
+parte_de_declaracao_de_variaveis (29)
     à esquerda: 4 6, à direita: 3 4
-$@2 (31)
+$@2 (30)
     à esquerda: 5, à direita: 6
-declaracao_de_variaveis (32)
+declaracao_de_variaveis (31)
     à esquerda: 9, à direita: 4 6
-$@3 (33)
+$@3 (32)
     à esquerda: 7, à direita: 9
-$@4 (34)
+$@4 (33)
     à esquerda: 8, à direita: 9
-lista_de_identificadores (35)
+lista_de_identificadores (34)
     à esquerda: 10 11, à direita: 2 9 10
-comando_composto (36)
+comando_composto (35)
     à esquerda: 12, à direita: 3 19
-comandos (37)
+comandos (36)
     à esquerda: 13 14, à direita: 12 13
-comando (38)
+comando (37)
     à esquerda: 16 17, à direita: 13 14
-$@5 (39)
+$@5 (38)
     à esquerda: 15, à direita: 16
-comando_sem_rotulo (40)
+comando_sem_rotulo (39)
     à esquerda: 18 19 20, à direita: 16 17
-atribuicao (41)
-    à esquerda: 21, à direita: 18
+atribuicao (40)
+    à esquerda: 22, à direita: 18
+$@6 (41)
+    à esquerda: 21, à direita: 22
 expressao (42)
-    à esquerda: 22 23 24 25, à direita: 21 22 23 24 31
+    à esquerda: 23 24 25 26, à direita: 22 23 24 25 32
 T (43)
-    à esquerda: 26 27 28 29, à direita: 22 23 24 25 26 27 28
+    à esquerda: 27 28 29 30, à direita: 23 24 25 26 27 28 29
 F (44)
-    à esquerda: 30 31 32, à direita: 26 27 28 29
-variavel (45)
-    à esquerda: 33, à direita: 21 30
+    à esquerda: 31 32 33, à direita: 27 28 29 30
 
 
 Estado 0
@@ -299,7 +297,6 @@ Estado 18
     comando             ir ao estado 27
     comando_sem_rotulo  ir ao estado 28
     atribuicao          ir ao estado 29
-    variavel            ir ao estado 30
 
 
 Estado 19
@@ -315,7 +312,7 @@ Estado 20
 
     IDENT  deslocar, e ir ao estado 7
 
-    lista_de_identificadores  ir ao estado 31
+    lista_de_identificadores  ir ao estado 30
 
 
 Estado 21
@@ -334,9 +331,11 @@ Estado 22
 
 Estado 23
 
-   33 variavel: IDENT .
+   22 atribuicao: IDENT . $@6 DOIS_PONTOS IGUAL expressao
 
-    $padrão  reduzir usando a regra 33 (variavel)
+    $padrão  reduzir usando a regra 21 ($@6)
+
+    $@6  ir ao estado 31
 
 
 Estado 24
@@ -387,17 +386,17 @@ Estado 29
 
 Estado 30
 
-   21 atribuicao: variavel . DOIS_PONTOS IGUAL expressao
+    9 declaracao_de_variaveis: $@3 lista_de_identificadores . DOIS_PONTOS TIPO $@4 PONTO_E_VIRGULA
+   10 lista_de_identificadores: lista_de_identificadores . VIRGULA IDENT
 
+    VIRGULA      deslocar, e ir ao estado 10
     DOIS_PONTOS  deslocar, e ir ao estado 35
 
 
 Estado 31
 
-    9 declaracao_de_variaveis: $@3 lista_de_identificadores . DOIS_PONTOS TIPO $@4 PONTO_E_VIRGULA
-   10 lista_de_identificadores: lista_de_identificadores . VIRGULA IDENT
+   22 atribuicao: IDENT $@6 . DOIS_PONTOS IGUAL expressao
 
-    VIRGULA      deslocar, e ir ao estado 10
     DOIS_PONTOS  deslocar, e ir ao estado 36
 
 
@@ -422,7 +421,6 @@ Estado 33
     comando             ir ao estado 38
     comando_sem_rotulo  ir ao estado 28
     atribuicao          ir ao estado 29
-    variavel            ir ao estado 30
 
 
 Estado 34
@@ -434,16 +432,16 @@ Estado 34
 
 Estado 35
 
-   21 atribuicao: variavel DOIS_PONTOS . IGUAL expressao
+    9 declaracao_de_variaveis: $@3 lista_de_identificadores DOIS_PONTOS . TIPO $@4 PONTO_E_VIRGULA
 
-    IGUAL  deslocar, e ir ao estado 39
+    TIPO  deslocar, e ir ao estado 39
 
 
 Estado 36
 
-    9 declaracao_de_variaveis: $@3 lista_de_identificadores DOIS_PONTOS . TIPO $@4 PONTO_E_VIRGULA
+   22 atribuicao: IDENT $@6 DOIS_PONTOS . IGUAL expressao
 
-    TIPO  deslocar, e ir ao estado 40
+    IGUAL  deslocar, e ir ao estado 40
 
 
 Estado 37
@@ -458,7 +456,6 @@ Estado 37
     comando_composto    ir ao estado 25
     comando_sem_rotulo  ir ao estado 41
     atribuicao          ir ao estado 29
-    variavel            ir ao estado 30
 
 
 Estado 38
@@ -470,25 +467,24 @@ Estado 38
 
 Estado 39
 
-   21 atribuicao: variavel DOIS_PONTOS IGUAL . expressao
-
-    ABRE_PARENTESES  deslocar, e ir ao estado 42
-    IDENT            deslocar, e ir ao estado 23
-    NUMERO           deslocar, e ir ao estado 43
-
-    expressao  ir ao estado 44
-    T          ir ao estado 45
-    F          ir ao estado 46
-    variavel   ir ao estado 47
-
-
-Estado 40
-
     9 declaracao_de_variaveis: $@3 lista_de_identificadores DOIS_PONTOS TIPO . $@4 PONTO_E_VIRGULA
 
     $padrão  reduzir usando a regra 8 ($@4)
 
-    $@4  ir ao estado 48
+    $@4  ir ao estado 42
+
+
+Estado 40
+
+   22 atribuicao: IDENT $@6 DOIS_PONTOS IGUAL . expressao
+
+    ABRE_PARENTESES  deslocar, e ir ao estado 43
+    IDENT            deslocar, e ir ao estado 44
+    NUMERO           deslocar, e ir ao estado 45
+
+    expressao  ir ao estado 46
+    T          ir ao estado 47
+    F          ir ao estado 48
 
 
 Estado 41
@@ -500,234 +496,227 @@ Estado 41
 
 Estado 42
 
-   31 F: ABRE_PARENTESES . expressao FECHA_PARENTESES
+    9 declaracao_de_variaveis: $@3 lista_de_identificadores DOIS_PONTOS TIPO $@4 . PONTO_E_VIRGULA
 
-    ABRE_PARENTESES  deslocar, e ir ao estado 42
-    IDENT            deslocar, e ir ao estado 23
-    NUMERO           deslocar, e ir ao estado 43
-
-    expressao  ir ao estado 49
-    T          ir ao estado 45
-    F          ir ao estado 46
-    variavel   ir ao estado 47
+    PONTO_E_VIRGULA  deslocar, e ir ao estado 49
 
 
 Estado 43
 
-   32 F: NUMERO .
+   32 F: ABRE_PARENTESES . expressao FECHA_PARENTESES
 
-    $padrão  reduzir usando a regra 32 (F)
+    ABRE_PARENTESES  deslocar, e ir ao estado 43
+    IDENT            deslocar, e ir ao estado 44
+    NUMERO           deslocar, e ir ao estado 45
+
+    expressao  ir ao estado 50
+    T          ir ao estado 47
+    F          ir ao estado 48
 
 
 Estado 44
 
-   21 atribuicao: variavel DOIS_PONTOS IGUAL expressao .
-   22 expressao: expressao . MAIS T
-   23          | expressao . MENOS T
-   24          | expressao . OR T
+   31 F: IDENT .
 
-    MAIS   deslocar, e ir ao estado 50
-    MENOS  deslocar, e ir ao estado 51
-    OR     deslocar, e ir ao estado 52
-
-    $padrão  reduzir usando a regra 21 (atribuicao)
+    $padrão  reduzir usando a regra 31 (F)
 
 
 Estado 45
 
-   25 expressao: T .
-   26 T: T . ASTERISTICO F
-   27  | T . DIV F
-   28  | T . AND F
+   33 F: NUMERO .
 
-    AND          deslocar, e ir ao estado 53
-    DIV          deslocar, e ir ao estado 54
-    ASTERISTICO  deslocar, e ir ao estado 55
-
-    $padrão  reduzir usando a regra 25 (expressao)
+    $padrão  reduzir usando a regra 33 (F)
 
 
 Estado 46
 
-   29 T: F .
+   22 atribuicao: IDENT $@6 DOIS_PONTOS IGUAL expressao .
+   23 expressao: expressao . MAIS T
+   24          | expressao . MENOS T
+   25          | expressao . OR T
 
-    $padrão  reduzir usando a regra 29 (T)
+    MAIS   deslocar, e ir ao estado 51
+    MENOS  deslocar, e ir ao estado 52
+    OR     deslocar, e ir ao estado 53
+
+    $padrão  reduzir usando a regra 22 (atribuicao)
 
 
 Estado 47
 
-   30 F: variavel .
+   26 expressao: T .
+   27 T: T . ASTERISTICO F
+   28  | T . DIV F
+   29  | T . AND F
 
-    $padrão  reduzir usando a regra 30 (F)
+    AND          deslocar, e ir ao estado 54
+    DIV          deslocar, e ir ao estado 55
+    ASTERISTICO  deslocar, e ir ao estado 56
+
+    $padrão  reduzir usando a regra 26 (expressao)
 
 
 Estado 48
 
-    9 declaracao_de_variaveis: $@3 lista_de_identificadores DOIS_PONTOS TIPO $@4 . PONTO_E_VIRGULA
+   30 T: F .
 
-    PONTO_E_VIRGULA  deslocar, e ir ao estado 56
+    $padrão  reduzir usando a regra 30 (T)
 
 
 Estado 49
-
-   22 expressao: expressao . MAIS T
-   23          | expressao . MENOS T
-   24          | expressao . OR T
-   31 F: ABRE_PARENTESES expressao . FECHA_PARENTESES
-
-    FECHA_PARENTESES  deslocar, e ir ao estado 57
-    MAIS              deslocar, e ir ao estado 50
-    MENOS             deslocar, e ir ao estado 51
-    OR                deslocar, e ir ao estado 52
-
-
-Estado 50
-
-   22 expressao: expressao MAIS . T
-
-    ABRE_PARENTESES  deslocar, e ir ao estado 42
-    IDENT            deslocar, e ir ao estado 23
-    NUMERO           deslocar, e ir ao estado 43
-
-    T         ir ao estado 58
-    F         ir ao estado 46
-    variavel  ir ao estado 47
-
-
-Estado 51
-
-   23 expressao: expressao MENOS . T
-
-    ABRE_PARENTESES  deslocar, e ir ao estado 42
-    IDENT            deslocar, e ir ao estado 23
-    NUMERO           deslocar, e ir ao estado 43
-
-    T         ir ao estado 59
-    F         ir ao estado 46
-    variavel  ir ao estado 47
-
-
-Estado 52
-
-   24 expressao: expressao OR . T
-
-    ABRE_PARENTESES  deslocar, e ir ao estado 42
-    IDENT            deslocar, e ir ao estado 23
-    NUMERO           deslocar, e ir ao estado 43
-
-    T         ir ao estado 60
-    F         ir ao estado 46
-    variavel  ir ao estado 47
-
-
-Estado 53
-
-   28 T: T AND . F
-
-    ABRE_PARENTESES  deslocar, e ir ao estado 42
-    IDENT            deslocar, e ir ao estado 23
-    NUMERO           deslocar, e ir ao estado 43
-
-    F         ir ao estado 61
-    variavel  ir ao estado 47
-
-
-Estado 54
-
-   27 T: T DIV . F
-
-    ABRE_PARENTESES  deslocar, e ir ao estado 42
-    IDENT            deslocar, e ir ao estado 23
-    NUMERO           deslocar, e ir ao estado 43
-
-    F         ir ao estado 62
-    variavel  ir ao estado 47
-
-
-Estado 55
-
-   26 T: T ASTERISTICO . F
-
-    ABRE_PARENTESES  deslocar, e ir ao estado 42
-    IDENT            deslocar, e ir ao estado 23
-    NUMERO           deslocar, e ir ao estado 43
-
-    F         ir ao estado 63
-    variavel  ir ao estado 47
-
-
-Estado 56
 
     9 declaracao_de_variaveis: $@3 lista_de_identificadores DOIS_PONTOS TIPO $@4 PONTO_E_VIRGULA .
 
     $padrão  reduzir usando a regra 9 (declaracao_de_variaveis)
 
 
+Estado 50
+
+   23 expressao: expressao . MAIS T
+   24          | expressao . MENOS T
+   25          | expressao . OR T
+   32 F: ABRE_PARENTESES expressao . FECHA_PARENTESES
+
+    FECHA_PARENTESES  deslocar, e ir ao estado 57
+    MAIS              deslocar, e ir ao estado 51
+    MENOS             deslocar, e ir ao estado 52
+    OR                deslocar, e ir ao estado 53
+
+
+Estado 51
+
+   23 expressao: expressao MAIS . T
+
+    ABRE_PARENTESES  deslocar, e ir ao estado 43
+    IDENT            deslocar, e ir ao estado 44
+    NUMERO           deslocar, e ir ao estado 45
+
+    T  ir ao estado 58
+    F  ir ao estado 48
+
+
+Estado 52
+
+   24 expressao: expressao MENOS . T
+
+    ABRE_PARENTESES  deslocar, e ir ao estado 43
+    IDENT            deslocar, e ir ao estado 44
+    NUMERO           deslocar, e ir ao estado 45
+
+    T  ir ao estado 59
+    F  ir ao estado 48
+
+
+Estado 53
+
+   25 expressao: expressao OR . T
+
+    ABRE_PARENTESES  deslocar, e ir ao estado 43
+    IDENT            deslocar, e ir ao estado 44
+    NUMERO           deslocar, e ir ao estado 45
+
+    T  ir ao estado 60
+    F  ir ao estado 48
+
+
+Estado 54
+
+   29 T: T AND . F
+
+    ABRE_PARENTESES  deslocar, e ir ao estado 43
+    IDENT            deslocar, e ir ao estado 44
+    NUMERO           deslocar, e ir ao estado 45
+
+    F  ir ao estado 61
+
+
+Estado 55
+
+   28 T: T DIV . F
+
+    ABRE_PARENTESES  deslocar, e ir ao estado 43
+    IDENT            deslocar, e ir ao estado 44
+    NUMERO           deslocar, e ir ao estado 45
+
+    F  ir ao estado 62
+
+
+Estado 56
+
+   27 T: T ASTERISTICO . F
+
+    ABRE_PARENTESES  deslocar, e ir ao estado 43
+    IDENT            deslocar, e ir ao estado 44
+    NUMERO           deslocar, e ir ao estado 45
+
+    F  ir ao estado 63
+
+
 Estado 57
 
-   31 F: ABRE_PARENTESES expressao FECHA_PARENTESES .
+   32 F: ABRE_PARENTESES expressao FECHA_PARENTESES .
 
-    $padrão  reduzir usando a regra 31 (F)
+    $padrão  reduzir usando a regra 32 (F)
 
 
 Estado 58
 
-   22 expressao: expressao MAIS T .
-   26 T: T . ASTERISTICO F
-   27  | T . DIV F
-   28  | T . AND F
+   23 expressao: expressao MAIS T .
+   27 T: T . ASTERISTICO F
+   28  | T . DIV F
+   29  | T . AND F
 
-    AND          deslocar, e ir ao estado 53
-    DIV          deslocar, e ir ao estado 54
-    ASTERISTICO  deslocar, e ir ao estado 55
-
-    $padrão  reduzir usando a regra 22 (expressao)
-
-
-Estado 59
-
-   23 expressao: expressao MENOS T .
-   26 T: T . ASTERISTICO F
-   27  | T . DIV F
-   28  | T . AND F
-
-    AND          deslocar, e ir ao estado 53
-    DIV          deslocar, e ir ao estado 54
-    ASTERISTICO  deslocar, e ir ao estado 55
+    AND          deslocar, e ir ao estado 54
+    DIV          deslocar, e ir ao estado 55
+    ASTERISTICO  deslocar, e ir ao estado 56
 
     $padrão  reduzir usando a regra 23 (expressao)
 
 
-Estado 60
+Estado 59
 
-   24 expressao: expressao OR T .
-   26 T: T . ASTERISTICO F
-   27  | T . DIV F
-   28  | T . AND F
+   24 expressao: expressao MENOS T .
+   27 T: T . ASTERISTICO F
+   28  | T . DIV F
+   29  | T . AND F
 
-    AND          deslocar, e ir ao estado 53
-    DIV          deslocar, e ir ao estado 54
-    ASTERISTICO  deslocar, e ir ao estado 55
+    AND          deslocar, e ir ao estado 54
+    DIV          deslocar, e ir ao estado 55
+    ASTERISTICO  deslocar, e ir ao estado 56
 
     $padrão  reduzir usando a regra 24 (expressao)
 
 
+Estado 60
+
+   25 expressao: expressao OR T .
+   27 T: T . ASTERISTICO F
+   28  | T . DIV F
+   29  | T . AND F
+
+    AND          deslocar, e ir ao estado 54
+    DIV          deslocar, e ir ao estado 55
+    ASTERISTICO  deslocar, e ir ao estado 56
+
+    $padrão  reduzir usando a regra 25 (expressao)
+
+
 Estado 61
 
-   28 T: T AND F .
+   29 T: T AND F .
 
-    $padrão  reduzir usando a regra 28 (T)
+    $padrão  reduzir usando a regra 29 (T)
 
 
 Estado 62
 
-   27 T: T DIV F .
+   28 T: T DIV F .
 
-    $padrão  reduzir usando a regra 27 (T)
+    $padrão  reduzir usando a regra 28 (T)
 
 
 Estado 63
 
-   26 T: T ASTERISTICO F .
+   27 T: T ASTERISTICO F .
 
-    $padrão  reduzir usando a regra 26 (T)
+    $padrão  reduzir usando a regra 27 (T)

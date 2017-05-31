@@ -23,7 +23,7 @@ int yyerror(char *);
 
 %token PROGRAM ABRE_PARENTESES FECHA_PARENTESES 
 %token VIRGULA PONTO_E_VIRGULA DOIS_PONTOS PONTO
-%token T_BEGIN T_END VAR IDENT TIPO ATRIBUICAO
+%token T_BEGIN T_END VAR IDENT TIPO
 
 //incluidos
 %token AND DIV IGUAL MAIS MENOS OR
@@ -91,7 +91,7 @@ declaracao_de_variaveis:
 
 		n_var_tipo = tabela_simbolos->tam - n_var_tipo;
 
-		for (i = 0, pos = tabela_simbolos->tam; i < n_var_tipo; i++, pos--) {
+		for (i = 0, pos = tabela_simbolos->tam - 1; i < n_var_tipo; i++, pos--) {
 			((tipo_variavel_simples)(tabela_simbolos->v[pos]))->tipo = tipo_var;
 		}
 	}
@@ -144,7 +144,14 @@ comando_sem_rotulo:
 
 // regra 19
 atribuicao:
-	variavel DOIS_PONTOS IGUAL expressao
+	IDENT
+	{
+		// busca por variavel na tabela de simbolos
+	}
+	DOIS_PONTOS IGUAL expressao
+	{
+		// armazena na variavel
+	}
 ;
 
 // regra 20
@@ -177,13 +184,15 @@ T:
 
 // regra 22
 F:
-	variavel {
-	/*busca na tabela de paginas;
+	IDENT {
+	/*busca por variavel ou funcao na tabela de paginas;
 	CRVR nivel deslocamento*/
 	} |
 	ABRE_PARENTESES expressao FECHA_PARENTESES |
-	NUMERO {
-	/*CRCT token*/
+	NUMERO
+	{
+		sprintf(comando_mepa, "CRCT %s", token);
+		gera_codigo(NULL, comando_mepa);
 	}
 ;
 
@@ -209,7 +218,6 @@ F:
 //declaracao_de_subrotinas: IDENT;
 //declaracao_de_tipos: IDENT;
 //desvio: IDENT;
-variavel: IDENT;
 
 %%
 

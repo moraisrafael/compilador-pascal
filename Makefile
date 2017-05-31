@@ -16,4 +16,4 @@ tabela.o: tabela.h tabela.c
 	gcc -g -c tabela.c -o tabela.o
 
 clean : 
-	rm -f compilador.tab.* lex.yy.c 
+	rm -f compilador.tab.* lex.yy.c *.o MEPA 
