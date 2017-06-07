@@ -86,7 +86,7 @@ declaracao_de_variaveis:
 		n_var_tipo = tabela_simbolos->tam - n_var_tipo;
 
 		for (i = 0, pos = tabela_simbolos->tam - 1; i < n_var_tipo; i++, pos--) {
-			transforma_identificador_variavel_simples(pos, simbolo);
+			transforma_identificador_variavel_simples(tabela_simbolos, pos, simbolo, nivel_lexico);
 		}
 	}
 	PONTO_E_VIRGULA

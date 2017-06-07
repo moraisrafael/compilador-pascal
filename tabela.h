@@ -20,7 +20,7 @@ typedef struct tipo_simbolo {
 
 typedef struct tipo_variavel_simples {
 	char identificador[TAM_IDENTIFICADOR];
-	tipo_identificador var_simples;
+	tipo_identificador variavel_simples;
 	simbolos tipo;
 	int nivel_lexico;
 	int deslocamento;
@@ -51,6 +51,6 @@ void* pop(pilha p);
 void* busca_tabela_simbolos(char* s);
 int init(pilha* p);
 int insere_identificador_tabela(char* token);
-int transforma_identificador_variavel_simples(int pos, simbolos tipo);
+int transforma_identificador_variavel_simples(pilha tabela, int pos, simbolos tipo, int nivel_lexico);
 
 extern pilha tabela_simbolos;
