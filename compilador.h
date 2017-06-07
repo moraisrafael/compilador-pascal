@@ -11,17 +11,16 @@
  *
  * ------------------------------------------------------------------- */
 
-#include "tabela.h"
 #define TAM_TOKEN 16
 
-typedef enum simbolos { 
-  simb_program, simb_var, simb_begin, simb_end, 
-  simb_identificador, simb_numero, simb_menos,
-  simb_ponto, simb_virgula, simb_ponto_e_virgula, simb_dois_pontos,
-  simb_igual, simb_abre_parenteses, simb_fecha_parenteses,
+typedef enum simbolos {
+  simb_program, simb_var, simb_begin, simb_end, simb_igual, simb_mais,
+  simb_menos, simb_asteristico, simb_barra, simb_mod, simb_div, simb_and,
+  simb_or, simb_ponto, simb_virgula, simb_ponto_e_virgula, simb_dois_pontos,
+  simb_atribuicao, simb_abre_parenteses, simb_fecha_parenteses, simb_do,
+  simb_while, simb_if, simb_else, simb_function, simb_procedure, simb_integer,
+  simb_ident, simb_numero
 } simbolos;
-
-
 
 /* -------------------------------------------------------------------
  * variáveis globais
@@ -30,7 +29,6 @@ typedef enum simbolos {
 extern simbolos simbolo, relacao;
 extern char token[TAM_TOKEN];
 extern int nl;
-extern tipo_variavel tipo_var;
 
 simbolos simbolo, relacao;
 char token[TAM_TOKEN];

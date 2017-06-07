@@ -41,13 +41,13 @@ int init(pilha* p) {
 	(*p)->tam = 0;
 }
 
-int insere_variavel_tabela(char* token, int nivel_lexico) {
-	tipo_variavel_simples variavel;
+int insere_identificador_tabela(char* token) {
+	tipo_token identificador;
 
-	variavel = malloc(sizeof(struct tipo_variavel_simples));
-	strncpy(variavel->identificador, token, TAM_IDENTIFICADOR);
-	variavel->nivel_lexico = nivel_lexico;
-	variavel->var_simples = variavel_simples;
+	identificador = malloc(sizeof(tipo_token));
+	strncpy(identificador, token, TAM_IDENTIFICADOR);
 
-	push(variavel, tabela_simbolos);
+	push(identificador, tabela_simbolos);
 }
+
+int transforma_identificador_variavel_simples(int pos, simbolos tipo){}

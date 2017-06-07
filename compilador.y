@@ -8,12 +8,12 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-#include "compilador.h"
+//#include "compilador.h"
+#include "tabela.h"
 
 int nivel_lexico, n_var, n_var_tipo, deslocamento, inicio_tipo;
 char comando_mepa[128];
 pilha tabela_simbolos;
-extern tipo_variavel tipo_var;
 
 
 // tirando warnings chatos
@@ -21,15 +21,9 @@ int yylex(void);
 int yyerror(char *);
 %}
 
-%token PROGRAM ABRE_PARENTESES FECHA_PARENTESES 
-%token VIRGULA PONTO_E_VIRGULA DOIS_PONTOS PONTO
-%token T_BEGIN T_END VAR IDENT TIPO
-
-//incluidos
-%token AND DIV IGUAL MAIS MENOS OR
-%token DO WHILE
-%token ASTERISTICO NUMERO
-
+%token PROGRAM VAR T_BEGIN T_END IGUAL MAIS MENOS ASTERISTICO BARRA MOD DIV AND
+%token OR PONTO VIRGULA PONTO_E_VIRGULA DOIS_PONTOS ATRIBUICAO ABRE_PARENTESES
+%token FECHA_PARENTESES DO WHILE IF ELSE FUNCTION PROCEDURE TIPO IDENT NUMERO
 
 %%
 
@@ -92,7 +86,7 @@ declaracao_de_variaveis:
 		n_var_tipo = tabela_simbolos->tam - n_var_tipo;
 
 		for (i = 0, pos = tabela_simbolos->tam - 1; i < n_var_tipo; i++, pos--) {
-			((tipo_variavel_simples)(tabela_simbolos->v[pos]))->tipo = tipo_var;
+			transforma_identificador_variavel_simples(pos, simbolo);
 		}
 	}
 	PONTO_E_VIRGULA
@@ -103,13 +97,13 @@ lista_de_identificadores:
 	lista_de_identificadores VIRGULA IDENT
 	{
 		/* insere última var na tabela de símbolos */
-		insere_variavel_tabela(token, nivel_lexico);
+		insere_identificador_tabela(token);
 	}
 	|
 	IDENT
 	{
 		/* insere vars na tabela de símbolos */
-		insere_variavel_tabela(token, nivel_lexico);
+		insere_identificador_tabela(token);
 	}
 ;
 
@@ -148,7 +142,7 @@ atribuicao:
 	{
 		// busca por variavel na tabela de simbolos
 	}
-	DOIS_PONTOS IGUAL expressao
+	ATRIBUICAO expressao
 	{
 		// armazena na variavel
 	}

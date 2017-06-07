@@ -10,8 +10,7 @@
 //#define IMPRIME(STR) {};
 #define IMPRIME(STR) printf("%s    # %s \n", STR, token);
 
-int nl = 1;  
-tipo_variavel tipo_var;
+int nl = 1;
 
 %}
 
@@ -63,10 +62,52 @@ end { simbolo = simb_end;
           return IGUAL;  
  }
 
+\+ { simbolo = simb_mais;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("mais             ");
+          return MAIS;
+  }
+
 - { simbolo = simb_menos;
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("menos            ");
           return MENOS;
+  }
+
+\* { simbolo = simb_asteristico;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("asteristico      ");
+          return ASTERISTICO;
+  }
+
+\/ { simbolo = simb_barra;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("barra            ");
+          return BARRA;
+  }
+
+mod { simbolo = simb_mod;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("mod              ");
+          return MOD;
+  }
+
+div { simbolo = simb_div;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("div              ");
+          return DIV;
+  }
+
+and { simbolo = simb_and;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("and              ");
+          return AND;
+  }
+
+or { simbolo = simb_or;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("OR               ");
+          return OR;
   }
 
 \; { simbolo = simb_ponto_e_virgula;  
@@ -74,6 +115,12 @@ end { simbolo = simb_end;
           IMPRIME("pt_virgula       ");
           return PONTO_E_VIRGULA;
  }
+
+\:= { simbolo = simb_atribuicao;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("atribuicao       ");
+          return ATRIBUICAO;
+  }
 
 \: { simbolo = simb_dois_pontos;  
           strncpy (token, yytext, TAM_TOKEN);
@@ -106,12 +153,49 @@ end { simbolo = simb_end;
           return FECHA_PARENTESES;
  }
 
-integer {
-        	tipo_var = integer;
-        	return TIPO;
-        }
+do { simbolo = simb_do;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("do               ");
+          return DO;
+  }
 
-{ident} { simbolo = simb_identificador; 
+while { simbolo = simb_while;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("while            ");
+          return WHILE;
+  }
+
+if { simbolo = simb_if;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("if               ");
+          return IF;
+  }
+
+else { simbolo = simb_else;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("else             ");
+          return ELSE;
+  }
+
+function { simbolo = simb_function;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("function         ");
+          return FUNCTION;
+  }
+
+procedure { simbolo = simb_procedure;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("procedure        ");
+          return PROCEDURE;
+  }
+
+integer { simbolo = simb_integer;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("integer          ");
+          return TIPO;
+  }
+
+{ident} { simbolo = simb_ident; 
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("ident            ");
           return IDENT;
@@ -122,7 +206,4 @@ integer {
            IMPRIME("numero           ");
            return NUMERO;
          }
-
-
 %%
-
