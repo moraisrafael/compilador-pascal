@@ -1,17 +1,17 @@
-#ifndef TABELA_SIMBOLOS
-	#define TAM_MAX_TABELA_SIMBOLOS 256
-	#define TAM_ROTULO 4
-	#define TAM_IDENTIFICADOR 256
-#endif
-#include "compilador.h"
+#ifndef TABELA_H
+#define TABELA_H
 
+#define TAM_MAX_TABELA_SIMBOLOS 256
+#define TAM_IDENTIFICADOR 256
+#include "compilador.h"
+#include "pilha.h"
+#include "rotulos.h"
 
 typedef enum tipo_identificador {
 	variavel_simples, rotulo, parametro_formal, procedimento, funcao
 } tipo_identificador;
 
 typedef char* tipo_token;
-	
 
 typedef struct tipo_simbolo {
 	char identificador[TAM_IDENTIFICADOR];
@@ -41,16 +41,11 @@ typedef struct tipo_procedimento {
 	parametro lista_parametros[];
 } *tipo_procedimento;
 
-typedef struct pilha {
-	int tam;
-	void** v;
-} *pilha;
-
-int push(void* s, pilha p);
-void* pop(pilha p);
 void* busca_tabela_simbolos(char* s);
-int init(pilha* p);
 int insere_identificador_tabela(char* token);
-int transforma_identificador_variavel_simples(pilha tabela, int pos, simbolos tipo, int nivel_lexico);
+int transforma_identificador_variavel_simples(int pos, simbolos tipo, int nivel_lexico, int deslocamento);
+void insere_rotulo_tabel(char* identificador, int nivel_lexico);
 
 extern pilha tabela_simbolos;
+
+#endif

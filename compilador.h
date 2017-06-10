@@ -11,6 +11,8 @@
  *
  * ------------------------------------------------------------------- */
 
+#ifndef COMPILADOR_H
+#define COMPILADOR_H
 #define TAM_TOKEN 16
 
 typedef enum simbolos {
@@ -19,7 +21,7 @@ typedef enum simbolos {
   simb_or, simb_ponto, simb_virgula, simb_ponto_e_virgula, simb_dois_pontos,
   simb_atribuicao, simb_abre_parenteses, simb_fecha_parenteses, simb_do,
   simb_while, simb_if, simb_else, simb_function, simb_procedure, simb_integer,
-  simb_ident, simb_numero
+  simb_ident, simb_numero, simb_label
 } simbolos;
 
 /* -------------------------------------------------------------------
@@ -33,5 +35,6 @@ extern int nl;
 simbolos simbolo, relacao;
 char token[TAM_TOKEN];
 void gera_codigo (char* rot, char* comando);
-int imprimeErro ( char* erro );
+int imprime_erro ( char* erro );
 
+#endif

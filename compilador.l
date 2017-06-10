@@ -38,7 +38,7 @@ program { simbolo  = simb_program;
           return PROGRAM;
  }
 
-var      { simbolo = simb_var;  
+var { simbolo = simb_var;  
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("var              ");
           return VAR;
@@ -55,6 +55,11 @@ end { simbolo = simb_end;
           IMPRIME("end              ");
           return T_END;
  }
+
+label { simbolo = simb_label;
+          strncpy (token, yytext, TAM_TOKEN);
+          return LABEL;
+  }
 
 = { simbolo = simb_igual;  
           strncpy (token, yytext, TAM_TOKEN);
@@ -199,11 +204,16 @@ integer { simbolo = simb_integer;
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("ident            ");
           return IDENT;
-        }
+  }
 
 {numero} { simbolo = simb_numero;
            strncpy (token, yytext, TAM_TOKEN);
            IMPRIME("numero           ");
            return NUMERO;
-         }
+  }
+label { simbolo = simb_label;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("label             ");
+          return LABEL;
+  }
 %%
