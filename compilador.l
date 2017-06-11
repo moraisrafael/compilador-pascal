@@ -68,6 +68,18 @@ goto { simbolo = simb_goto;
           return GOTO;
   }
 
+read { simbolo = simb_read;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("read             ");
+          return READ;
+  }
+
+write { simbolo = simb_write;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("write            ");
+          return WRITE;
+  }
+
 = { simbolo = simb_igual;  
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("igual            ");

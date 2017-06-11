@@ -27,7 +27,7 @@ int yyerror(char *);
 %token PROGRAM VAR T_BEGIN T_END IGUAL MAIS MENOS ASTERISTICO BARRA MOD DIV AND
 %token OR PONTO VIRGULA PONTO_E_VIRGULA DOIS_PONTOS ATRIBUICAO ABRE_PARENTESES
 %token FECHA_PARENTESES DO WHILE IF ELSE FUNCTION PROCEDURE TIPO IDENT NUMERO
-%token LABEL GOTO
+%token LABEL GOTO READ WRITE
 
 %%
 
@@ -162,7 +162,9 @@ comando_sem_rotulo:
 	desvio |
 	comando_composto |
 	//comando_condicional |
-	comando_repetitivo
+	comando_repetitivo |
+	read |
+	write
 ;
 
 // regra 19
@@ -251,7 +253,8 @@ F:
 				imprime_erro(erro);
 				exit(-1);
 		}
-	} |
+	}
+	|
 	ABRE_PARENTESES expressao FECHA_PARENTESES |
 	NUMERO
 	{
@@ -313,6 +316,138 @@ comando_repetitivo:
 //comando_condicional: IDENT;
 //declaracao_de_subrotinas: IDENT;
 //declaracao_de_tipos: IDENT;
+
+read:
+	READ ABRE_PARENTESES lista_ident_read FECHA_PARENTESES
+;
+
+lista_ident_read:
+	lista_ident_read VIRGULA IDENT
+	{
+		tipo_simbolo entrada_tabela;
+		//busca por variavel ou parametro formal na tabela de paginas;
+		entrada_tabela = busca_tabela_simbolos(token);
+		if (entrada_tabela == NULL) {
+			sprintf(erro, "identificador \"%s\" não declarado\n", token);
+			imprime_erro(erro);
+			exit(-1);
+		}
+		gera_codigo(NULL,"LEIT");
+		switch (entrada_tabela->tipo) {
+			case variavel_simples:
+				sprintf(comando_mepa, "ARMZ %d,%d",
+					((tipo_variavel_simples)entrada_tabela)->nivel_lexico,
+					((tipo_variavel_simples)entrada_tabela)->deslocamento);
+				gera_codigo(NULL, comando_mepa);
+				break;
+			case parametro_formal:
+				break;
+			case funcao:
+				break;
+			default:
+				sprintf(erro, "\"%s\" nao esperado\n Esperava integer\n", token);
+				imprime_erro(erro);
+				exit(-1);
+		}
+		
+	}
+	|
+	IDENT
+	{
+		tipo_simbolo entrada_tabela;
+		//busca por variavel ou parametro formal na tabela de paginas;
+		entrada_tabela = busca_tabela_simbolos(token);
+		if (entrada_tabela == NULL) {
+			sprintf(erro, "identificador \"%s\" não declarado\n", token);
+			imprime_erro(erro);
+			exit(-1);
+		}
+		gera_codigo(NULL,"LEIT");
+		switch (entrada_tabela->tipo) {
+			case variavel_simples:
+				sprintf(comando_mepa, "ARMZ %d,%d",
+					((tipo_variavel_simples)entrada_tabela)->nivel_lexico,
+					((tipo_variavel_simples)entrada_tabela)->deslocamento);
+				gera_codigo(NULL, comando_mepa);
+				break;
+			case parametro_formal:
+				break;
+			case funcao:
+				break;
+			default:
+				sprintf(erro, "\"%s\" nao esperado\n Esperava integer\n", token);
+				imprime_erro(erro);
+				exit(-1);
+		}
+		
+	}
+;
+
+write:
+	WRITE ABRE_PARENTESES lista_ident_write FECHA_PARENTESES
+;
+
+lista_ident_write:
+	lista_ident_read VIRGULA IDENT
+	{
+		tipo_simbolo entrada_tabela;
+		//busca por variavel ou parametro formal na tabela de paginas;
+		entrada_tabela = busca_tabela_simbolos(token);
+		if (entrada_tabela == NULL) {
+			sprintf(erro, "identificador \"%s\" não declarado\n", token);
+			imprime_erro(erro);
+			exit(-1);
+		}
+		switch (entrada_tabela->tipo) {
+			case variavel_simples:
+				sprintf(comando_mepa, "ARMZ %d,%d",
+					((tipo_variavel_simples)entrada_tabela)->nivel_lexico,
+					((tipo_variavel_simples)entrada_tabela)->deslocamento);
+				gera_codigo(NULL, comando_mepa);
+				gera_codigo(NULL,"IMPR");
+				break;
+			case parametro_formal:
+				break;
+			case funcao:
+				break;
+			default:
+				sprintf(erro, "\"%s\" nao esperado\n Esperava integer\n", token);
+				imprime_erro(erro);
+				exit(-1);
+		}
+		
+	}
+	|
+	IDENT
+	{
+		tipo_simbolo entrada_tabela;
+		//busca por variavel ou parametro formal na tabela de paginas;
+		entrada_tabela = busca_tabela_simbolos(token);
+		if (entrada_tabela == NULL) {
+			sprintf(erro, "identificador \"%s\" não declarado\n", token);
+			imprime_erro(erro);
+			exit(-1);
+		}
+		gera_codigo(NULL,"LEIT");
+		switch (entrada_tabela->tipo) {
+			case variavel_simples:
+				sprintf(comando_mepa, "ARMZ %d,%d",
+					((tipo_variavel_simples)entrada_tabela)->nivel_lexico,
+					((tipo_variavel_simples)entrada_tabela)->deslocamento);
+				gera_codigo(NULL, comando_mepa);
+				break;
+			case parametro_formal:
+				break;
+			case funcao:
+				break;
+			default:
+				sprintf(erro, "\"%s\" nao esperado\n Esperava integer\n", token);
+				imprime_erro(erro);
+				exit(-1);
+		}
+		
+	}
+;
 
 %%
 

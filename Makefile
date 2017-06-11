@@ -22,4 +22,4 @@ rotulos.o: rotulos.h rotulos.c
 	gcc -g -c rotulos.c -o rotulos.o
 
 clean : 
-	rm -f compilador.tab.* lex.yy.c *.o MEPA 
+	rm -f compilador.output compilador.tab.* lex.yy.c *.o MEPA 
