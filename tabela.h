@@ -26,11 +26,21 @@ typedef struct tipo_variavel_simples {
 	int deslocamento;
 } *tipo_variavel_simples;
 
-typedef struct parametro {
+typedef struct tipo_rotulo {
+	char identificador[TAM_IDENTIFICADOR];
+	tipo_identificador rotulo;
+	int nivel_lexico;
+	char rotulo_mepa[TAM_ROTULO];
+} *tipo_rotulo;
+
+typedef struct tipo_parametro_formal {
 	char indentificador[TAM_IDENTIFICADOR];
+	tipo_identificador parametro_formal;
 	simbolos tipo;
+	int nivel_lexico;
+	int deslocamento;
 	int referencia;
-} parametro;
+} *tipo_parametro_formal;
 
 typedef struct tipo_procedimento {
 	char identificador[TAM_IDENTIFICADOR];
@@ -38,7 +48,6 @@ typedef struct tipo_procedimento {
 	char rotulo[TAM_ROTULO];
 	int nivel_lexico;
 	int n_parametros;
-	parametro lista_parametros[];
 } *tipo_procedimento;
 
 void* busca_tabela_simbolos(char* s);

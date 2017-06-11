@@ -58,7 +58,14 @@ end { simbolo = simb_end;
 
 label { simbolo = simb_label;
           strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("label            ");
           return LABEL;
+  }
+
+goto { simbolo = simb_goto;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("goto             ");
+          return GOTO;
   }
 
 = { simbolo = simb_igual;  
@@ -210,10 +217,5 @@ integer { simbolo = simb_integer;
            strncpy (token, yytext, TAM_TOKEN);
            IMPRIME("numero           ");
            return NUMERO;
-  }
-label { simbolo = simb_label;
-          strncpy (token, yytext, TAM_TOKEN);
-          IMPRIME("label             ");
-          return LABEL;
   }
 %%

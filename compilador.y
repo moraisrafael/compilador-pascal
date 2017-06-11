@@ -27,7 +27,7 @@ int yyerror(char *);
 %token PROGRAM VAR T_BEGIN T_END IGUAL MAIS MENOS ASTERISTICO BARRA MOD DIV AND
 %token OR PONTO VIRGULA PONTO_E_VIRGULA DOIS_PONTOS ATRIBUICAO ABRE_PARENTESES
 %token FECHA_PARENTESES DO WHILE IF ELSE FUNCTION PROCEDURE TIPO IDENT NUMERO
-%token LABEL
+%token LABEL GOTO
 
 %%
 
@@ -55,18 +55,18 @@ bloco:
 ;
 
 declaracao_de_rotulos:
-	LABEL lista_labels PONTO_E_VIRGULA
+	LABEL lista_rotulos PONTO_E_VIRGULA |
 ;
 
-lista_labels:
-	NUMERO
+lista_rotulos:
+	lista_rotulos VIRGULA NUMERO
 	{
 		insere_rotulo_tabela(token, nivel_lexico);
 	}
-	VIRGULA lista_labels |
+	|
 	NUMERO
 	{
-		insere_rotulo_tqbela(token, nivel_lexico);
+		insere_rotulo_tabela(token, nivel_lexico);
 	}
 ;
 
@@ -135,27 +135,34 @@ comandos:
 // regra 17
 comando:
 	NUMERO {
-	/*gera rotulo*/
+		tipo_rotulo entrada_tabela;
+		//busca por rotulo na tabela de paginas;
+		entrada_tabela = busca_tabela_simbolos(token);
+		if (entrada_tabela == NULL) {
+			sprintf(erro, "rotulo \"%s\" não declarado\n", token);
+			imprime_erro(erro);
+			exit(-1);
+		}
+		if (entrada_tabela->rotulo != rotulo) {
+			sprintf(erro, "esperava um rotulo, recebeu \"%s\"", token);
+			imprime_erro(erro);
+			exit(-1);
+		}
+		sprintf(comando_mepa, "ENRT %d,%d", nivel_lexico, n_var);
+		gera_codigo(entrada_tabela->rotulo_mepa, comando_mepa);
 	}
-	DOIS_PONTOS comando_sem_rotulo
-	{
-		gera_codigo(rotulo_mepa, comando_mepa);
-	}
-	|
+	DOIS_PONTOS comando_sem_rotulo |
 	comando_sem_rotulo
-	{
-		gera_codigo(NULL, comando_mepa);
-	}
 ;
 
 // regra 18
 comando_sem_rotulo:
 	atribuicao |
 	//chamada_de_processo |
-	//desvio |
-	comando_composto //|
+	desvio |
+	comando_composto |
 	//comando_condicional |
-	//comando_repetitivo
+	comando_repetitivo
 ;
 
 // regra 19
@@ -185,6 +192,7 @@ atribuicao:
 				imprime_erro(erro);
 				exit(-1);
 		}
+		gera_codigo(NULL, comando_mepa);
 	}
 ;
 
@@ -252,28 +260,59 @@ F:
 	}
 ;
 
-// regra 23
-//comando_repetitivo:
-//	WHILE {
-	/*gera_rotulo*/
-	/*empilha rotulo*/
-//	gera_codigo(NULL, "NADA");
-//	}
-//	expressao {
-	/*desvio rotulo2*/
-//	}
-//	DO comando_sem_rotulo {
-	/*desvio rotulo 1*/
-//	}
-//;
+desvio:
+	GOTO NUMERO
+	{
+		tipo_rotulo entrada_tabela;
+		//busca por rotulo na tabela de paginas;
+		entrada_tabela = busca_tabela_simbolos(token);
+		if (entrada_tabela == NULL) {
+			sprintf(erro, "rotulo \"%s\" não declarado\n", token);
+			imprime_erro(erro);
+			exit(-1);
+		}
+		if (entrada_tabela->rotulo != rotulo) {
+			sprintf(erro, "esperava um rotulo, recebeu \"%s\"", token);
+			imprime_erro(erro);
+			exit(-1);
+		}
+		sprintf(comando_mepa, "DSVR %s,%d,%d", entrada_tabela->rotulo_mepa, entrada_tabela->nivel_lexico, nivel_lexico);
+		gera_codigo(NULL, comando_mepa);
+	}
+;
+
+//regra 23
+comando_repetitivo:
+	WHILE {
+		gera_rotulo(rotulo_mepa); // fim do while
+		push(rotulo_mepa, pilha_rotulos);
+		gera_rotulo(rotulo_mepa); // inicio do while
+		push(rotulo_mepa, pilha_rotulos);
+		gera_codigo(rotulo_mepa, "NADA");
+	}
+	expressao {
+		sprintf(comando_mepa, "DSVF %s", (char*)pilha_rotulos->v[pilha_rotulos->tam-2]);
+		gera_codigo(NULL, comando_mepa); // desvia para fim do while se falso
+	}
+	DO comando_sem_rotulo {
+		char* rotulo;
+		rotulo = pop(pilha_rotulos);
+		sprintf(comando_mepa, "DSVS %s", rotulo); // volta ao inicio do while
+		free(rotulo);
+		gera_codigo(NULL, comando_mepa);
+		rotulo = pop(pilha_rotulos);
+		gera_codigo(rotulo, "NADA"); // fim do while
+		free(rotulo);
+	}
+;
+
+
 
 // falta implementar regras:
 //chamada_de_processo: IDENT;
 //comando_condicional: IDENT;
-//declaracao_de_rotulos: IDENT;
 //declaracao_de_subrotinas: IDENT;
 //declaracao_de_tipos: IDENT;
-//desvio: IDENT;
 
 %%
 
