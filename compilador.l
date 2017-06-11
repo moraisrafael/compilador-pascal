@@ -80,6 +80,18 @@ write { simbolo = simb_write;
           return WRITE;
   }
 
+\> { simbolo = simb_maior;  
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("maior            ");
+          return MAIOR;  
+ }
+
+\< { simbolo = simb_menor;  
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("menor            ");
+          return MENOR;
+ }
+
 = { simbolo = simb_igual;  
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("igual            ");

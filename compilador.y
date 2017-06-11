@@ -27,7 +27,7 @@ int yyerror(char *);
 %token PROGRAM VAR T_BEGIN T_END IGUAL MAIS MENOS ASTERISTICO BARRA MOD DIV AND
 %token OR PONTO VIRGULA PONTO_E_VIRGULA DOIS_PONTOS ATRIBUICAO ABRE_PARENTESES
 %token FECHA_PARENTESES DO WHILE IF ELSE FUNCTION PROCEDURE TIPO IDENT NUMERO
-%token LABEL GOTO READ WRITE
+%token LABEL GOTO READ WRITE MAIOR MENOR
 
 %%
 
@@ -60,7 +60,7 @@ bloco:
 	//declaracao_de_subrotinas
 	{
 		char* rotulo = pop(pilha_rotulos);
-		gera_codigo(rotulo, "NADA");
+		gera_codigo(rotulo, "NADA ");
 		free(rotulo);
 	}
 	comando_composto
@@ -223,7 +223,13 @@ expressao:
 	gera_codigo(NULL, "SUBT");
 	} |
 	expressao OR T {
-	gera_codigo(NULL, NULL);/////////////////////////////////////////////
+	gera_codigo(NULL, "DISJ");
+	} |
+	expressao MENOR T {
+	gera_codigo(NULL, "CMME");
+	} |
+	expressao MAIOR T {
+	gera_codigo(NULL, "CMMA");
 	} |
 	T
 ;
@@ -237,7 +243,13 @@ T:
 	gera_codigo(NULL, "DIVI");
 	} |
 	T AND F {
-	gera_codigo(NULL, NULL);/////////////////////////////////////////////////////
+	gera_codigo(NULL, "CONJ");
+	} |
+	T MENOR IGUAL F {
+	gera_codigo(NULL, "CMEG");
+	} |
+	T MAIOR IGUAL F {
+	gera_codigo(NULL, "CMAG");
 	} |
 	T IGUAL F {
 	gera_codigo(NULL, "CMIG");
@@ -313,7 +325,7 @@ comando_repetitivo:
 		gera_rotulo(fim_while);
 		push(fim_while, pilha_rotulos);
 		push(inicio_while, pilha_rotulos);
-		gera_codigo(inicio_while, "NADA");
+		gera_codigo(inicio_while, "NADA ");
 	}
 	expressao {
 		sprintf(comando_mepa, "DSVF %s", (char*)pilha_rotulos->v[pilha_rotulos->tam-2]);
@@ -326,7 +338,7 @@ comando_repetitivo:
 		free(rotulo);
 		gera_codigo(NULL, comando_mepa);
 		rotulo = pop(pilha_rotulos);
-		gera_codigo(rotulo, "NADA"); // fim do while
+		gera_codigo(rotulo, "NADA "); // fim do while
 		free(rotulo);
 	}
 ;
