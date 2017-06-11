@@ -9,7 +9,7 @@ pilha pilha_rotulos;
 void gera_rotulo(char* rotulo) {
 	static int i = 0;
 	
-	sprintf(rotulo, "R%03d", i);
+	sprintf(rotulo, "R%02d", i);
 	i++;
 }
 

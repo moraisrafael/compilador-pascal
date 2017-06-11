@@ -29,7 +29,7 @@ void gera_codigo (char* rot, char* comando) {
   }
 
   if ( rot == NULL ) {
-    fprintf(fp, "      %s\n", comando); fflush(fp);
+    fprintf(fp, "     %s\n", comando); fflush(fp);
     //printf("CODIGO:     %s\n", comando);
   } else {
     fprintf(fp, "%s: %s\n", rot, comando); fflush(fp);

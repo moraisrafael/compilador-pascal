@@ -50,8 +50,24 @@ bloco:
 	declaracao_de_rotulos
 	//declaracao_de_tipos
 	parte_de_declaracao_de_variaveis
+	{
+		char* rotulo = malloc(TAM_ROTULO);
+		gera_rotulo(rotulo);
+		push(rotulo, pilha_rotulos);
+		sprintf(comando_mepa, "DSVS %s", rotulo);
+		gera_codigo(NULL, comando_mepa);
+	}
 	//declaracao_de_subrotinas
+	{
+		char* rotulo = pop(pilha_rotulos);
+		gera_codigo(rotulo, "NADA");
+		free(rotulo);
+	}
 	comando_composto
+	{
+		sprintf(comando_mepa, "DMEM %d", n_var);
+		gera_codigo(NULL, comando_mepa);
+	}
 ;
 
 declaracao_de_rotulos:
@@ -148,7 +164,7 @@ comando:
 			imprime_erro(erro);
 			exit(-1);
 		}
-		sprintf(comando_mepa, "ENRT %d,%d", nivel_lexico, n_var);
+		sprintf(comando_mepa, "ENRT %d, %d", nivel_lexico, n_var);
 		gera_codigo(entrada_tabela->rotulo_mepa, comando_mepa);
 	}
 	DOIS_PONTOS comando_sem_rotulo |
@@ -183,7 +199,7 @@ atribuicao:
 	{
 		switch (((tipo_simbolo)lado_esquerdo)->tipo) {
 			case variavel_simples:
-				sprintf(comando_mepa, "ARMZ %d,%d",
+				sprintf(comando_mepa, "ARMZ %d, %d",
 					((tipo_variavel_simples)lado_esquerdo)->nivel_lexico,
 					((tipo_variavel_simples)lado_esquerdo)->deslocamento);
 				break;
@@ -223,6 +239,9 @@ T:
 	T AND F {
 	gera_codigo(NULL, NULL);/////////////////////////////////////////////////////
 	} |
+	T IGUAL F {
+	gera_codigo(NULL, "CMIG");
+	} |
 	F
 ;
 
@@ -239,7 +258,7 @@ F:
 		}
 		switch (((tipo_simbolo)entrada_tabela)->tipo) {
 			case variavel_simples:
-				sprintf(comando_mepa, "CRVL %d,%d",
+				sprintf(comando_mepa, "CRVL %d, %d",
 					((tipo_variavel_simples)entrada_tabela)->nivel_lexico,
 					((tipo_variavel_simples)entrada_tabela)->deslocamento);
 				gera_codigo(NULL, comando_mepa);
@@ -279,7 +298,7 @@ desvio:
 			imprime_erro(erro);
 			exit(-1);
 		}
-		sprintf(comando_mepa, "DSVR %s,%d,%d", entrada_tabela->rotulo_mepa, entrada_tabela->nivel_lexico, nivel_lexico);
+		sprintf(comando_mepa, "DSVR %s, %d, %d", entrada_tabela->rotulo_mepa, entrada_tabela->nivel_lexico, nivel_lexico);
 		gera_codigo(NULL, comando_mepa);
 	}
 ;
@@ -287,11 +306,14 @@ desvio:
 //regra 23
 comando_repetitivo:
 	WHILE {
-		gera_rotulo(rotulo_mepa); // fim do while
-		push(rotulo_mepa, pilha_rotulos);
-		gera_rotulo(rotulo_mepa); // inicio do while
-		push(rotulo_mepa, pilha_rotulos);
-		gera_codigo(rotulo_mepa, "NADA");
+		char *inicio_while, *fim_while;
+		inicio_while = malloc(sizeof(TAM_ROTULO));
+		fim_while = malloc(sizeof(TAM_ROTULO));
+		gera_rotulo(inicio_while);
+		gera_rotulo(fim_while);
+		push(fim_while, pilha_rotulos);
+		push(inicio_while, pilha_rotulos);
+		gera_codigo(inicio_while, "NADA");
 	}
 	expressao {
 		sprintf(comando_mepa, "DSVF %s", (char*)pilha_rotulos->v[pilha_rotulos->tam-2]);
@@ -335,7 +357,7 @@ lista_ident_read:
 		gera_codigo(NULL,"LEIT");
 		switch (entrada_tabela->tipo) {
 			case variavel_simples:
-				sprintf(comando_mepa, "ARMZ %d,%d",
+				sprintf(comando_mepa, "ARMZ %d, %d",
 					((tipo_variavel_simples)entrada_tabela)->nivel_lexico,
 					((tipo_variavel_simples)entrada_tabela)->deslocamento);
 				gera_codigo(NULL, comando_mepa);
@@ -365,7 +387,7 @@ lista_ident_read:
 		gera_codigo(NULL,"LEIT");
 		switch (entrada_tabela->tipo) {
 			case variavel_simples:
-				sprintf(comando_mepa, "ARMZ %d,%d",
+				sprintf(comando_mepa, "ARMZ %d, %d",
 					((tipo_variavel_simples)entrada_tabela)->nivel_lexico,
 					((tipo_variavel_simples)entrada_tabela)->deslocamento);
 				gera_codigo(NULL, comando_mepa);
@@ -388,7 +410,7 @@ write:
 ;
 
 lista_ident_write:
-	lista_ident_read VIRGULA IDENT
+	lista_ident_write VIRGULA IDENT
 	{
 		tipo_simbolo entrada_tabela;
 		//busca por variavel ou parametro formal na tabela de paginas;
@@ -400,7 +422,7 @@ lista_ident_write:
 		}
 		switch (entrada_tabela->tipo) {
 			case variavel_simples:
-				sprintf(comando_mepa, "ARMZ %d,%d",
+				sprintf(comando_mepa, "CRVL %d, %d",
 					((tipo_variavel_simples)entrada_tabela)->nivel_lexico,
 					((tipo_variavel_simples)entrada_tabela)->deslocamento);
 				gera_codigo(NULL, comando_mepa);
@@ -428,13 +450,13 @@ lista_ident_write:
 			imprime_erro(erro);
 			exit(-1);
 		}
-		gera_codigo(NULL,"LEIT");
 		switch (entrada_tabela->tipo) {
 			case variavel_simples:
-				sprintf(comando_mepa, "ARMZ %d,%d",
+				sprintf(comando_mepa, "CRVL %d, %d",
 					((tipo_variavel_simples)entrada_tabela)->nivel_lexico,
 					((tipo_variavel_simples)entrada_tabela)->deslocamento);
 				gera_codigo(NULL, comando_mepa);
+				gera_codigo(NULL,"IMPR");
 				break;
 			case parametro_formal:
 				break;
