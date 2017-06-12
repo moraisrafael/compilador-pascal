@@ -22,6 +22,8 @@ ident [a-zAZ][a-zAZ1-9]*
 
 numero [0-9]+
 
+imag [0-9]+[i]
+
 comentario "(*".*"*)"
 
 %%
@@ -247,6 +249,12 @@ integer { simbolo = simb_integer;
           IMPRIME("integer          ");
           return TIPO;
   }
+  
+imaginario { simbolo = simb_imag;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("timaginario          ");
+          return TIPO;
+  }
 
 {ident} { simbolo = simb_ident; 
           strncpy (token, yytext, TAM_TOKEN);
@@ -258,5 +266,11 @@ integer { simbolo = simb_integer;
            strncpy (token, yytext, TAM_TOKEN);
            IMPRIME("numero           ");
            return NUMERO;
+  }
+
+{imag} { simbolo = simb_imaginario;
+           strncpy (token, yytext, TAM_TOKEN);
+           IMPRIME("imaginario       ");
+           return IMAGINARIO;
   }
 %%

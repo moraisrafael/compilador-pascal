@@ -13,7 +13,7 @@
 #include "tabela.h"
 #include "rotulos.h"
 
-typedef enum tipos { integer = simb_integer, boolean } tipos;
+typedef enum tipos { integer = simb_integer, boolean, imaginario = simb_imag } tipos;
 
 int nivel_lexico, n_var, tam_ant, inicio_tipo, n_parametros;
 char rotulo_mepa[8] = "", comando_mepa[128], erro[512];
@@ -21,11 +21,15 @@ void* lado_esquerdo;
 pilha tabela_simbolos;
 tipos tipo_E, tipo_T, tipo_F;
 
-void verifica_tipo(tipos recebido, tipos esperado) {
+void verifica_tipo(tipos esperado, tipos recebido) {
 	if (recebido != esperado)
 		imprime_erro("conflito de tipo esperado");
 }
 
+void verifica_tipo2(tipos esperado, tipos esperado2, tipos recebido) {
+	if (recebido != esperado)
+		imprime_erro("conflito de tipo esperado");
+}
 
 
 // tirando warnings chatos
@@ -36,7 +40,7 @@ int yyerror(char *);
 %token PROGRAM VAR T_BEGIN T_END IGUAL MAIS MENOS ASTERISTICO BARRA MOD DIV AND
 %token OR PONTO VIRGULA PONTO_E_VIRGULA DOIS_PONTOS ATRIBUICAO ABRE_PARENTESES
 %token FECHA_PARENTESES DO WHILE IF THEN ELSE FUNCTION PROCEDURE TIPO IDENT NUMERO
-%token LABEL GOTO READ WRITE MAIOR MENOR MAIOR_IGUAL MENOR_IGUAL
+%token LABEL GOTO READ WRITE MAIOR MENOR MAIOR_IGUAL MENOR_IGUAL IMAGINARIO
 
 %nonassoc LOWER_THAN_ELSE
 %nonassoc ELSE
@@ -235,17 +239,17 @@ atribuicao:
 // regra 20
 expressao:
 	expressao {
-		verifica_tipo(tipo_E, integer);
+		verifica_tipo2(tipo_E, integer, imaginario);
 	} MAIS T {
-		verifica_tipo(tipo_T, integer);
-		tipo_E = integer;
+		verifica_tipo2(tipo_T, integer, imaginario);
+		tipo_E = tipo_T == integer ? integer : imaginario;
 		gera_codigo(NULL, "SOMA");
 	} |
 	expressao {
-		verifica_tipo(tipo_E, integer);
+		verifica_tipo2(tipo_E, integer, imaginario);
 	} MENOS T {
-		verifica_tipo(tipo_T, integer);
-		tipo_E = integer;
+		verifica_tipo2(tipo_T, integer, imaginario);
+		tipo_E = tipo_T == integer ? integer : imaginario;
 		gera_codigo(NULL, "SUBT");
 	} |
 	expressao {
@@ -256,16 +260,16 @@ expressao:
 		gera_codigo(NULL, "DISJ");
 	} |
 	expressao {
-		verifica_tipo(tipo_E, integer);
+		verifica_tipo2(tipo_E, integer, imaginario);
 	} MENOR T {
-		verifica_tipo(tipo_T, integer);
+		verifica_tipo2(tipo_T, integer, imaginario);
 		tipo_E = boolean;
 		gera_codigo(NULL, "CMME");
 	} |
 	expressao {
-		verifica_tipo(tipo_E, integer);
+		verifica_tipo2(tipo_E, integer, imaginario);
 	} MAIOR T {
-		verifica_tipo(tipo_T, integer);
+		verifica_tipo2(tipo_T, integer, imaginario);
 		tipo_E = boolean;
 		gera_codigo(NULL, "CMMA");
 	} |
@@ -278,17 +282,19 @@ expressao:
 // regra 21
 T:
 	T {
-		verifica_tipo(tipo_T, integer);
+		verifica_tipo2(tipo_T, integer, imaginario);
 	} ASTERISTICO F {
-		verifica_tipo(tipo_F, integer);
-		tipo_T = integer;
+		verifica_tipo2(tipo_F, integer, imaginario);
+		tipo_T = tipo_T == tipo_F ? integer : imaginario;
 		gera_codigo(NULL, "MULT");
 	} |
 	T {
-		verifica_tipo(tipo_T, integer);
+		verifica_tipo2(tipo_T, integer, imaginario);
 	} DIV F {
-		verifica_tipo(tipo_F, integer);
-		tipo_T = integer;
+		verifica_tipo2(tipo_F, integer, imaginario);
+		if ((tipo_F == imaginario) && (tipo_T == integer))
+			imprime_erro("divisao de inteiro por imaginario");
+		tipo_T = tipo_T == tipo_F ? integer : imaginario;
 		gera_codigo(NULL, "DIVI");
 	} |
 	T {
@@ -299,23 +305,23 @@ T:
 		gera_codigo(NULL, "CONJ");
 	} |
 	T MENOR_IGUAL  {
-		verifica_tipo(tipo_T, integer);
+		verifica_tipo2(tipo_T, integer, imaginario);
 	} F {
-		verifica_tipo(tipo_F, integer);
+		verifica_tipo2(tipo_F, integer, imaginario);
 		tipo_T = boolean;
 		gera_codigo(NULL, "CMEG");
 	} |
 	T MAIOR_IGUAL  {
-		verifica_tipo(tipo_T, integer);
+		verifica_tipo2(tipo_T, integer, imaginario);
 	} F {
-		verifica_tipo(tipo_F, integer);
+		verifica_tipo2(tipo_F, integer, imaginario);
 		tipo_T = boolean;
 		gera_codigo(NULL, "CMAG");
 	} |
 	T IGUAL {
-		verifica_tipo(tipo_T, integer);
+		verifica_tipo2(tipo_T, integer, imaginario);
 	} F {
-		verifica_tipo(tipo_F, integer);
+		verifica_tipo2(tipo_F, integer, imaginario);
 		tipo_T = boolean;
 		gera_codigo(NULL, "CMIG");
 	} |
@@ -355,12 +361,26 @@ F:
 		}
 	}
 	|
-	ABRE_PARENTESES expressao FECHA_PARENTESES |
+	ABRE_PARENTESES expressao FECHA_PARENTESES
+	{
+		tipo_F = tipo_E;
+	} |
 	NUMERO
 	{
 		sprintf(comando_mepa, "CRCT %s", token);
 		gera_codigo(NULL, comando_mepa);
 		tipo_F = integer;
+	} |
+	IMAGINARIO {
+		int i;
+		for (i = 0; i < TAM_IDENTIFICADOR; i++) {
+			if (token[i] == 'i') {
+				token[i] = '\0';
+			}
+		}
+		sprintf(comando_mepa, "CRCT %s", token);
+		gera_codigo(NULL, comando_mepa);
+		tipo_F = imaginario;
 	}
 ;
 
