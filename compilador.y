@@ -36,7 +36,7 @@ int yyerror(char *);
 %token PROGRAM VAR T_BEGIN T_END IGUAL MAIS MENOS ASTERISTICO BARRA MOD DIV AND
 %token OR PONTO VIRGULA PONTO_E_VIRGULA DOIS_PONTOS ATRIBUICAO ABRE_PARENTESES
 %token FECHA_PARENTESES DO WHILE IF ELSE FUNCTION PROCEDURE TIPO IDENT NUMERO
-%token LABEL GOTO READ WRITE MAIOR MENOR
+%token LABEL GOTO READ WRITE MAIOR MENOR MAIOR_IGUAL MENOR_IGUAL
 
 %%
 
@@ -290,14 +290,14 @@ T:
 		tipo_T = boolean;
 		gera_codigo(NULL, "CONJ");
 	} |
-	T MENOR IGUAL  {
+	T MENOR_IGUAL  {
 		verifica_tipo(tipo_T, boolean);
 	} F {
 		verifica_tipo(tipo_F, boolean);
 		tipo_T = boolean;
 		gera_codigo(NULL, "CMEG");
 	} |
-	T MAIOR IGUAL  {
+	T MAIOR_IGUAL  {
 		verifica_tipo(tipo_T, boolean);
 	} F {
 		verifica_tipo(tipo_F, boolean);
