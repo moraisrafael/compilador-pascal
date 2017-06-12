@@ -13,10 +13,19 @@
 #include "tabela.h"
 #include "rotulos.h"
 
-int nivel_lexico, n_var, tam_ant, inicio_tipo;
+typedef enum tipos { integer = simb_integer, boolean } tipos;
+
+int nivel_lexico, n_var, tam_ant, inicio_tipo, n_parametros;
 char rotulo_mepa[8] = "", comando_mepa[128], erro[512];
 void* lado_esquerdo;
 pilha tabela_simbolos;
+tipos tipo_E, tipo_T, tipo_F;
+
+void verifica_tipo(tipos recebido, tipos esperado) {
+	if (recebido != esperado)
+		imprime_erro("conflito de tipo esperado");
+}
+
 
 
 // tirando warnings chatos
@@ -174,7 +183,7 @@ comando:
 // regra 18
 comando_sem_rotulo:
 	atribuicao |
-	//chamada_de_processo |
+	chamada_de_processo |
 	desvio |
 	comando_composto |
 	//comando_condicional |
@@ -199,6 +208,7 @@ atribuicao:
 	{
 		switch (((tipo_simbolo)lado_esquerdo)->tipo) {
 			case variavel_simples:
+				verifica_tipo(((tipo_variavel_simples)lado_esquerdo)->tipo, tipo_E);
 				sprintf(comando_mepa, "ARMZ %d, %d",
 					((tipo_variavel_simples)lado_esquerdo)->nivel_lexico,
 					((tipo_variavel_simples)lado_esquerdo)->deslocamento);
@@ -216,45 +226,95 @@ atribuicao:
 
 // regra 20
 expressao:
-	expressao MAIS T {
-	gera_codigo(NULL, "SOMA");
+	expressao {
+		verifica_tipo(tipo_E, integer);
+	} MAIS T {
+		verifica_tipo(tipo_T, integer);
+		tipo_E = integer;
+		gera_codigo(NULL, "SOMA");
 	} |
-	expressao MENOS T {
-	gera_codigo(NULL, "SUBT");
+	expressao {
+		verifica_tipo(tipo_E, integer);
+	} MENOS T {
+		verifica_tipo(tipo_T, integer);
+		tipo_E = integer;
+		gera_codigo(NULL, "SUBT");
 	} |
-	expressao OR T {
-	gera_codigo(NULL, "DISJ");
+	expressao {
+		verifica_tipo(tipo_E, boolean);
+	} OR T {
+		verifica_tipo(tipo_T, boolean);
+		tipo_E = boolean;
+		gera_codigo(NULL, "DISJ");
 	} |
-	expressao MENOR T {
-	gera_codigo(NULL, "CMME");
+	expressao {
+		verifica_tipo(tipo_E, integer);
+	} MENOR T {
+		verifica_tipo(tipo_T, integer);
+		tipo_E = boolean;
+		gera_codigo(NULL, "CMME");
 	} |
-	expressao MAIOR T {
-	gera_codigo(NULL, "CMMA");
+	expressao {
+		verifica_tipo(tipo_E, integer);
+	} MAIOR T {
+		verifica_tipo(tipo_T, integer);
+		tipo_E = boolean;
+		gera_codigo(NULL, "CMMA");
 	} |
 	T
+	{
+		tipo_E = tipo_T;
+	}
 ;
 
 // regra 21
 T:
-	T ASTERISTICO F {
-	gera_codigo(NULL, "MULT");
+	T {
+		verifica_tipo(tipo_T, integer);
+	} ASTERISTICO F {
+		verifica_tipo(tipo_F, integer);
+		tipo_T = integer;
+		gera_codigo(NULL, "MULT");
 	} |
-	T DIV F {
-	gera_codigo(NULL, "DIVI");
+	T {
+		verifica_tipo(tipo_T, integer);
+	} DIV F {
+		verifica_tipo(tipo_F, integer);
+		tipo_T = integer;
+		gera_codigo(NULL, "DIVI");
 	} |
-	T AND F {
-	gera_codigo(NULL, "CONJ");
+	T {
+		verifica_tipo(tipo_T, boolean);
+	} AND F {
+		verifica_tipo(tipo_F, boolean);
+		tipo_T = boolean;
+		gera_codigo(NULL, "CONJ");
 	} |
-	T MENOR IGUAL F {
-	gera_codigo(NULL, "CMEG");
+	T MENOR IGUAL  {
+		verifica_tipo(tipo_T, boolean);
+	} F {
+		verifica_tipo(tipo_F, boolean);
+		tipo_T = boolean;
+		gera_codigo(NULL, "CMEG");
 	} |
-	T MAIOR IGUAL F {
-	gera_codigo(NULL, "CMAG");
+	T MAIOR IGUAL  {
+		verifica_tipo(tipo_T, boolean);
+	} F {
+		verifica_tipo(tipo_F, boolean);
+		tipo_T = boolean;
+		gera_codigo(NULL, "CMAG");
 	} |
-	T IGUAL F {
-	gera_codigo(NULL, "CMIG");
+	T IGUAL {
+		verifica_tipo(tipo_T, integer);
+	} F {
+		verifica_tipo(tipo_F, integer);
+		tipo_T = boolean;
+		gera_codigo(NULL, "CMIG");
 	} |
 	F
+	{
+		tipo_T = tipo_F;
+	}
 ;
 
 // regra 22
@@ -291,6 +351,67 @@ F:
 	{
 		sprintf(comando_mepa, "CRCT %s", token);
 		gera_codigo(NULL, comando_mepa);
+	}
+;
+
+
+chamada_de_processo:
+	IDENT
+	{
+		tipo_procedimento entrada_tabela;
+		//busca por procedimento na tabela de paginas;
+		entrada_tabela = busca_tabela_simbolos(token);
+		if (entrada_tabela == NULL) {
+			sprintf(erro, "procedure \"%s\" não declarado\n", token);
+			imprime_erro(erro);
+			exit(-1);
+		}
+		if (entrada_tabela->procedimento != procedimento) {
+			sprintf(erro, "Esperava procedure, recebeu \"%s\"", token);
+			imprime_erro(erro);
+			exit(-1);
+		}
+		lado_esquerdo = entrada_tabela;
+	}
+	ABRE_PARENTESES lista_parametros_chamada
+	{
+		if (n_parametros != ((tipo_procedimento)lado_esquerdo)->n_parametros) {
+			sprintf(erro, "%s esperava %d parametros, mas recebeu %d",
+				((tipo_procedimento)lado_esquerdo)->identificador,
+				((tipo_procedimento)lado_esquerdo)->n_parametros,
+				n_parametros);
+			imprime_erro(erro);
+			exit(-1);
+		}
+		sprintf(comando_mepa, "CHPR %s, %d", ((tipo_procedimento)lado_esquerdo)->rotulo, nivel_lexico);
+		gera_codigo(NULL, comando_mepa);
+	}
+	FECHA_PARENTESES
+;
+
+lista_parametros_chamada:
+	lista_parametros_chamada VIRGULA expressao
+	{
+		tipo_procedimento procedimento = lado_esquerdo;
+		tipo_parametro_formal parametro;
+
+		n_parametros++;
+		if (procedimento->n_parametros < n_parametros)
+			imprime_erro("numero incorreto de parametros");
+		parametro = tabela_simbolos->v[procedimento->pos + n_parametros];
+		verifica_tipo(parametro->tipo, tipo_E);
+	}
+	|
+	expressao
+	{
+		tipo_procedimento procedimento = lado_esquerdo;
+		tipo_parametro_formal parametro;
+
+		n_parametros++;
+		if (procedimento->n_parametros < n_parametros)
+			imprime_erro("numero incorreto de parametros");
+		parametro = tabela_simbolos->v[procedimento->pos + n_parametros];
+		verifica_tipo(parametro->tipo, tipo_E);
 	}
 ;
 

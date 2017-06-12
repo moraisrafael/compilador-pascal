@@ -48,6 +48,7 @@ typedef struct tipo_procedimento {
 	char rotulo[TAM_ROTULO];
 	int nivel_lexico;
 	int n_parametros;
+	int pos;
 } *tipo_procedimento;
 
 void* busca_tabela_simbolos(char* s);
