@@ -35,8 +35,11 @@ int yyerror(char *);
 
 %token PROGRAM VAR T_BEGIN T_END IGUAL MAIS MENOS ASTERISTICO BARRA MOD DIV AND
 %token OR PONTO VIRGULA PONTO_E_VIRGULA DOIS_PONTOS ATRIBUICAO ABRE_PARENTESES
-%token FECHA_PARENTESES DO WHILE IF ELSE FUNCTION PROCEDURE TIPO IDENT NUMERO
+%token FECHA_PARENTESES DO WHILE IF THEN ELSE FUNCTION PROCEDURE TIPO IDENT NUMERO
 %token LABEL GOTO READ WRITE MAIOR MENOR MAIOR_IGUAL MENOR_IGUAL
+
+%nonassoc LOWER_THAN_ELSE
+%nonassoc ELSE
 
 %%
 
@@ -56,12 +59,17 @@ programa:
 
 // regra 2
 bloco:
+	{
+		char* rotulo = malloc(TAM_ROTULO);
+		gera_rotulo(rotulo);
+		push(rotulo, pilha_rotulos);
+	}
 	declaracao_de_rotulos
 	//declaracao_de_tipos
 	parte_de_declaracao_de_variaveis
 	{
-		char* rotulo = malloc(TAM_ROTULO);
-		gera_rotulo(rotulo);
+		char* rotulo;
+		rotulo = pop(pilha_rotulos);
 		push(rotulo, pilha_rotulos);
 		sprintf(comando_mepa, "DSVS %s", rotulo);
 		gera_codigo(NULL, comando_mepa);
@@ -183,10 +191,10 @@ comando:
 // regra 18
 comando_sem_rotulo:
 	atribuicao |
-	chamada_de_processo |
+	//chamada_de_processo |
 	desvio |
 	comando_composto |
-	//comando_condicional |
+	comando_condicional |
 	comando_repetitivo |
 	read |
 	write
@@ -291,16 +299,16 @@ T:
 		gera_codigo(NULL, "CONJ");
 	} |
 	T MENOR_IGUAL  {
-		verifica_tipo(tipo_T, boolean);
+		verifica_tipo(tipo_T, integer);
 	} F {
-		verifica_tipo(tipo_F, boolean);
+		verifica_tipo(tipo_F, integer);
 		tipo_T = boolean;
 		gera_codigo(NULL, "CMEG");
 	} |
 	T MAIOR_IGUAL  {
-		verifica_tipo(tipo_T, boolean);
+		verifica_tipo(tipo_T, integer);
 	} F {
-		verifica_tipo(tipo_F, boolean);
+		verifica_tipo(tipo_F, integer);
 		tipo_T = boolean;
 		gera_codigo(NULL, "CMAG");
 	} |
@@ -334,11 +342,12 @@ F:
 					((tipo_variavel_simples)entrada_tabela)->nivel_lexico,
 					((tipo_variavel_simples)entrada_tabela)->deslocamento);
 				gera_codigo(NULL, comando_mepa);
+				tipo_F = ((tipo_variavel_simples)entrada_tabela)->tipo;
 				break;
-			case parametro_formal:
+			/*case parametro_formal:
 				break;
 			case funcao:
-				break;
+				break;*/
 			default:
 				sprintf(erro, "\"%s\" nao esperado\n Esperava integer\n", token);
 				imprime_erro(erro);
@@ -351,11 +360,12 @@ F:
 	{
 		sprintf(comando_mepa, "CRCT %s", token);
 		gera_codigo(NULL, comando_mepa);
+		tipo_F = integer;
 	}
 ;
 
 
-chamada_de_processo:
+/*chamada_de_processo:
 	IDENT
 	{
 		tipo_procedimento entrada_tabela;
@@ -413,7 +423,7 @@ lista_parametros_chamada:
 		parametro = tabela_simbolos->v[procedimento->pos + n_parametros];
 		verifica_tipo(parametro->tipo, tipo_E);
 	}
-;
+;*/
 
 desvio:
 	GOTO NUMERO
@@ -434,6 +444,49 @@ desvio:
 		sprintf(comando_mepa, "DSVR %s, %d, %d", entrada_tabela->rotulo_mepa, entrada_tabela->nivel_lexico, nivel_lexico);
 		gera_codigo(NULL, comando_mepa);
 	}
+;
+
+comando_condicional:
+	if_then cond_else 
+    { 
+		// em_if_finaliza ();
+		char* rot_fim = pop(pilha_rotulos);
+		gera_codigo(rot_fim, "NADA");
+		free(rot_fim);
+	}
+;
+
+if_then:
+	IF expressao 
+	{
+		//em_if_apos_expr ();
+		char *rot_else, *rot_fim;
+		rot_else = malloc(TAM_ROTULO);
+		rot_fim = malloc(TAM_ROTULO);
+		gera_rotulo(rot_else);
+		gera_rotulo(rot_fim);
+		push(rot_else, pilha_rotulos);
+		push(rot_fim, pilha_rotulos);
+		sprintf(comando_mepa, "DSVF, %s", rot_else);
+		gera_codigo(NULL, comando_mepa);
+	}
+	THEN comando_sem_rotulo
+	{
+		//em_if_apos_then ();
+		char *rot_else, *rot_fim;
+		rot_fim = pop(pilha_rotulos);
+		sprintf(comando_mepa, "DSVS %s", rot_fim);
+		gera_codigo(NULL, comando_mepa);
+		rot_else = pop(pilha_rotulos);
+		gera_codigo(rot_else, "NADA");
+		free(rot_else);
+		push(rot_fim, pilha_rotulos);
+	}
+;
+
+cond_else:
+	ELSE comando_sem_rotulo
+	| %prec LOWER_THAN_ELSE
 ;
 
 //regra 23
@@ -571,6 +624,12 @@ lista_ident_write:
 				exit(-1);
 		}
 		
+	} |
+	lista_ident_write VIRGULA NUMERO
+	{
+		sprintf(comando_mepa, "CRCT %s", token);
+		gera_codigo(NULL, comando_mepa);
+		gera_codigo(NULL,"IMPR");
 	}
 	|
 	IDENT
@@ -601,6 +660,12 @@ lista_ident_write:
 				exit(-1);
 		}
 		
+	} |
+	NUMERO
+	{
+		sprintf(comando_mepa, "CRCT %s", token);
+		gera_codigo(NULL, comando_mepa);
+		gera_codigo(NULL,"IMPR");
 	}
 ;
 
@@ -629,4 +694,5 @@ int main (int argc, char** argv) {
 
 	return 0;
 }
+
 
